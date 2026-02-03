@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mavericks Global Master V12</title>
+    <style>
+        :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; --alert: #ff9800; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 1100px; margin: auto; background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        .logo-container img { max-width: 400px; width: 100%; height: auto; border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .card { padding: 15px; border: 1px solid #eee; border-radius: 12px; background: #fff; }
+        .header { background: var(--primary); color: white; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; font-size: 0.8rem; text-transform: uppercase; text-align: center;}
+        .input-group { margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 3px; color: #444; font-size: 0.7rem; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .alert-box { background: #fff3e0; border-left: 5px solid var(--alert); padding: 12px; font-size: 0.8rem; color: #e65100; margin-bottom: 15px; border-radius: 0 8px 8px 0; display: none; }
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .result-box { padding: 15px; border-radius: 15px; border-top: 6px solid var(--primary); background: #f9f9f9; }
+        .landed-highlight { background: var(--accent); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 2px solid #fbc02d; }
+        .big-val { font-size: 1.5rem; font-weight: bold; color: #333; }
+        .status-pill { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
+        .green-pill { background: #c8e6c9; color: #2e7d32; }
+        .red-pill { background: #ffcdd2; color: #c62828; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .results-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="display:flex; justify-content:flex-end; gap:5px; margin-bottom:10px;">
+        <button onclick="setLang('en')" id="btnEN" style="border-radius:20px; padding:5px 15px; cursor:pointer;">EN</button>
+        <button onclick="setLang('pt')" id="btnPT" style="border-radius:20px; padding:5px 15px; cursor:pointer;">PT</button>
+    </div>
+
+    <div class="logo-container">
+        <img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo">
+    </div>
+
+    <div id="tariffAlert" class="alert-box"></div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="header">1. IMPORT SPECS</div>
+            <div class="input-group"><label>HS / NCM CODE</label><input type="text" id="hsCode" placeholder="4407.11" oninput="calculate()"></div>
+            <div class="input-group"><label>Origin</label>
+                <select id="origin" onchange="calculate()">
+                    <option value="Brazil">Brazil</option>
+                    <option value="China">China</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="input-group"><label>Unit Cost ($)</label><input type="number" id="unitCost" value="10.00" oninput="calculate()"></div>
+            <div class="input-group"><label>Quantity</label><input type="number" id="qty" value="1000" oninput="calculate()"></div>
+        </div>
+
+        <div class="card">
+            <div class="header">2. LOGISTICS</div>
+            <div class="input-group"><label>Total Freight ($)</label><input type="number" id="freight" value="2500" oninput="calculate()"></div>
+            <div class="input-group"><label>Insurance (%)</label><input type="number" id="insRate" value="1" oninput="calculate()"></div>
+            <div class="input-group"><label>Internal (Drayage) ($)</label><input type="number" id="internalFreight" value="500" oninput="calculate()"></div>
+            <div class="input-group"><label>Broker/Other Fees ($)</label><input type="number" id="otherFees" value="500" oninput="calculate()"></div>
+        </div>
+
+        <div class="card">
+            <div class="header">3. STRATEGY</div>
+            <div class="input-group"><label>Desired Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()"></div>
+            <div class="input-group"><label>Exchange Rate ($1 = R$)</label>
+                <div style="display:flex; gap:3px;"><input type="number" id="exRate" value="5.25" step="0.01" oninput="calculate()"><button onclick="getLiveExchangeRate()">🔄</button></div>
+            </div>
+            <div class="input-group"><label>Mkt Price USA ($)</label><input type="number" id="priceUSA" value="50.00" oninput="calculate()"></div>
+            <div id="brPriceSection" class="input-group"><label>Mkt Price Brazil (R$)</label><input type="number" id="priceBR" value="200.00" oninput="calculate()"></div>
+        </div>
+    </div>
+
+    <div id="resultsWrapper" class="results-grid">
+        <div class="result-box usa-box" id="usaResultCard" style="border-top-color:#3b5998;">
+            <strong id="resUSA">USA (IMPORT)</strong>
+            <div class="landed-highlight">
+                <div style="font-size:0.75rem;">TRUE LANDED COST (Unit)</div>
+                <div class="big-val" id="landedUSA">$0.00</div>
+            </div>
+            <div id="statusUSA"></div>
+        </div>
+        <div class="result-box brazil-box" id="brResultCard" style="border-top-color:#009c3b;">
+            <strong id="resBR">BRAZIL (IMPORT)</strong>
+            <div class="landed-highlight">
+                <div style="font-size:0.75rem;">CUSTO REAL NO CHÃO (Unit)</div>
+                <div class="big-val" id="landedBR">R$0.00</div>
+            </div>
+            <div id="statusBR"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const hsLib = {
+    "4407.11": { name: "Softwood Lumber", usBase: 0.10, brII: 0.16, exemptFrom40: true },
+    "9403.40": { name: "Kitchen Cabinets", usBase: 0.25, brII: 0.18, exemptFrom40: true },
+    "4412.39": { name: "Plywood Sheets", usBase: 0.08, brII: 0.18, exemptFrom40: false },
+    "8518.30": { name: "Earbuds/Electronics", usBase: 0.00, brII: 0.16, exemptFrom40: false }
+};
+
+let currentLang = 'en';
+const trans = {
+    en: { ok: "Profitable", no: "Price Low", alertS232: "Mavericks Lumber Alert: 10-25% S232 active. Brazil 40% Surcharge EXEMPT." },
+    pt: { ok: "Lucrativo", no: "Preço Baixo", alertS232: "Alerta de Madeira: 10-25% S232 ativa. Isento da sobretaxa de 40% do Brasil." }
+};
+
+function setLang(l) { currentLang = l; calculate(); }
+
+function calculate() {
+    const buy = parseFloat(document.getElementById('unitCost').value) || 0;
+    const qty = parseFloat(document.getElementById('qty').value) || 1;
+    const freight = parseFloat(document.getElementById('freight').value) || 0;
+    const margin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
+    const exRate = parseFloat(document.getElementById('exRate').value) || 5.25;
+    const origin = document.getElementById('origin').value;
+    const hs = document.getElementById('hsCode').value.trim();
+    const alertBox = document.getElementById('tariffAlert');
+
+    // UI Hiding
+    if(origin === 'Brazil') {
+        document.getElementById('brResultCard').style.display = 'none';
+        document.getElementById('brPriceSection').style.display = 'none';
+        document.getElementById('resultsWrapper').style.gridTemplateColumns = '1fr';
+    } else {
+        document.getElementById('brResultCard').style.display = 'block';
+        document.getElementById('brPriceSection').style.display = 'block';
+        document.getElementById('resultsWrapper').style.gridTemplateColumns = '1fr 1fr';
+    }
+
+    let usTax = 0.035; let isExempt = false;
+    if(hsLib[hs]) {
+        usTax = hsLib[hs].usBase; isExempt = hsLib[hs].exemptFrom40;
+        if(origin === 'Brazil' && isExempt) {
+            alertBox.innerText = trans[currentLang].alertS232;
+            alertBox.style.display = "block";
+        } else { alertBox.style.display = "none"; }
+    } else { alertBox.style.display = "none"; }
+
+    if(origin === 'China') usTax += 0.25;
+    if(origin === 'Brazil' && !isExempt) usTax += 0.40;
+
+    const cif = (buy * qty) + freight + (buy * qty * (parseFloat(document.getElementById('insRate').value)/100)) + parseFloat(document.getElementById('otherFees').value) + parseFloat(document.getElementById('internalFreight').value);
+    const landedUnitUSA = (cif + (cif * usTax) + 50) / qty;
+    const landedUnitBR_BRL = ((cif + (cif * 0.78)) * exRate) / qty;
+
+    const reqUSA = (landedUnitUSA + 4.50) / (1 - 0.23 - margin);
+    document.getElementById('landedUSA').innerText = '$' + landedUnitUSA.toFixed(2);
+    document.getElementById('landedBR').innerText = 'R$' + landedUnitBR_BRL.toFixed(2);
+
+    const isUSAOk = (parseFloat(document.getElementById('priceUSA').value) || 0) >= reqUSA;
+    document.getElementById('statusUSA').innerHTML = `<span class="status-pill ${isUSAOk ? 'green-pill' : 'red-pill'}">${isUSAOk ? trans[currentLang].ok : trans[currentLang].no}</span>`;
+    
+    if(origin !== 'Brazil') {
+        const reqBR = (landedUnitBR_BRL + 25.00) / (1 - 0.26 - margin);
+        const isBROk = (parseFloat(document.getElementById('priceBR').value) || 0) >= reqBR;
+        document.getElementById('statusBR').innerHTML = `<span class="status-pill ${isBROk ? 'green-pill' : 'red-pill'}">${isBROk ? trans[currentLang].ok : trans[currentLang].no}</span>`;
+    }
+}
+
+async function getLiveExchangeRate() {
+    try {
+        const response = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await response.json();
+        const rate = data.rates.BRL;
+        if (rate) { document.getElementById('exRate').value = rate.toFixed(2); calculate(); }
+    } catch (e) { console.error(e); }
+}
+window.onload = () => { getLiveExchangeRate(); };
+</script>
+</body>
+</html>
