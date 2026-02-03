@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mavericks Global Master V26</title>
+    <title>Mavericks Master V29</title>
     <style>
         :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; --alert: #ff9800; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; -webkit-font-smoothing: antialiased; }
         .container { max-width: 1200px; margin: auto; background: var(--white); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .v-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 320px; }
-        .lang-switch { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; }
+        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 300px; }
+        .lang-switch { display: flex; gap: 8px; }
         .lang-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
         .lang-btn.active { background: var(--primary); color: white; }
         .grid { display: flex; flex-direction: column; gap: 15px; }
@@ -25,16 +27,22 @@
         .result-box { padding: 15px; border-radius: 12px; border-top: 6px solid var(--primary); background: #f9f9f9; }
         .landed-highlight { background: var(--accent); padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 2px solid #fbc02d; }
         .big-val { font-size: 1.4rem; font-weight: bold; color: #333; margin: 0; }
-        .action-btn { background: var(--secondary); color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .action-btn { background: var(--secondary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         #lumberConverter { display: none; background: #e8f5e9; border: 1px dashed #2e7d32; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .history-card { margin-top: 20px; background: #fafafa; border: 1px solid #ddd; border-radius: 10px; padding: 10px; }
+        .history-list { font-size: 0.75rem; width: 100%; border-collapse: collapse; }
+        .history-list th, .history-list td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="lang-switch">
-        <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
-        <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
+    <div class="app-header">
+        <span class="v-badge">V29 - STABLE</span>
+        <div class="lang-switch">
+            <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
+            <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
+        </div>
     </div>
 
     <div class="logo-container"><img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo"></div>
@@ -43,15 +51,14 @@
 
     <div class="card" style="margin-bottom: 15px;">
         <label id="lblNotes">PROJECT / PRODUCT NOTES</label>
-        <textarea id="projNotes" rows="1" placeholder="e.g. 500 units of Smart Locks"></textarea>
+        <textarea id="projNotes" rows="1" placeholder="Enter Description"></textarea>
     </div>
 
     <div class="grid">
         <div class="card">
             <div class="header" id="h1">1. IMPORT SPECS</div>
-            <div class="input-group"><label id="lblHS">HS / NCM CODE</label><input type="text" id="hsCode" placeholder="Enter Code" oninput="autoCategory()" onclick="clearZero(this)"></div>
-            <div class="input-group">
-                <label id="lblOrigin">Origin</label>
+            <div class="input-group"><label id="lblHS">HS / NCM CODE</label><input type="text" id="hsCode" placeholder="Code Search" oninput="autoCategory()" onclick="clearZero(this)"></div>
+            <div class="input-group"><label id="lblOrigin">Origin</label>
                 <select id="origin" onchange="calculate()">
                     <option value="Brazil">Brazil</option>
                     <option value="China">China</option>
@@ -60,7 +67,7 @@
             </div>
             <div class="input-group"><label id="lblUnit">Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div class="input-group"><label id="lblQty">Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblManualDuty">Import Duty (%)</label><input type="number" id="manualDuty" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
+            <div class="input-group"><label id="lblManualDuty">Duty Override (%)</label><input type="number" id="manualDuty" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
         </div>
 
         <div class="card">
@@ -70,15 +77,15 @@
             <div class="input-group"><label id="lblInt">Local Drayage ($)</label><input type="number" id="internalFreight" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div class="input-group"><label id="lblOther">Broker/Fees ($)</label><input type="number" id="otherFees" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div style="font-size:0.6rem; color:#666; padding-top:5px; border-top:1px solid #eee;">
-                BR TAXES: IPI % <input type="number" id="brIPI" value="5" oninput="calculate()" onclick="clearZero(this)" style="width:40px; padding:2px;"> 
-                ICMS % <input type="number" id="brICMS" value="18" oninput="calculate()" onclick="clearZero(this)" style="width:40px; padding:2px;">
+                BR TAXES: IPI % <input type="number" id="brIPI" value="5" oninput="calculate()" onclick="clearZero(this)" style="width:35px;"> 
+                ICMS % <input type="number" id="brICMS" value="18" oninput="calculate()" onclick="clearZero(this)" style="width:35px;">
             </div>
         </div>
 
         <div class="card">
             <div class="header" id="h3">3. STRATEGY</div>
             <div class="input-group"><label id="lblMargin">Desired Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblEx">Exchange Rate ($1 = R$)</label>
+            <div class="input-group"><label id="lblEx">Exchange Rate (USD/BRL)</label>
                 <div style="display:flex; gap:3px;"><input type="number" id="exRate" value="5.26" step="0.01" oninput="calculate()" onclick="clearZero(this)"><button onclick="getLiveExchangeRate()">🔄</button></div>
             </div>
             <div class="input-group"><label id="lblMktUSA">Market Price USA ($)</label><input type="number" id="priceUSA" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
@@ -94,7 +101,7 @@
                     <input type="number" id="volInput" value="0" oninput="convertWood()" onclick="clearZero(this)" style="font-size:10px;">
                 </div>
                 <div id="resBF" style="font-weight:bold; color:#2e7d32; font-size:0.7rem;">BF: 0.00</div>
-                <button class="action-btn" onclick="applyConversion()" style="padding:4px; font-size:9px;">APPLY TO QTY</button>
+                <button class="action-btn" onclick="applyConversion()" style="padding:4px; font-size:9px; margin-top:5px;">APPLY TO QTY</button>
             </div>
         </div>
     </div>
@@ -111,52 +118,43 @@
             <div id="lblTargetBR" style="font-size:0.7rem; font-weight:bold; color:#1b5e20;">PREÇO ALVO</div><div class="big-val" id="reqBR" style="color:#1b5e20; font-size:1.2rem;">R$0.00</div>
         </div>
     </div>
+
+    <button class="action-btn" onclick="saveToHistory()" id="btnSave">SAVE TO HISTORY</button>
+
+    <div class="history-card">
+        <div class="header" style="background:#444" id="hHistory">CALCULATION HISTORY</div>
+        <table class="history-list"><thead><tr><th id="thNotes">Project</th><th id="thLanded">Landed</th><th id="thTarget">Target</th><th>X</th></tr></thead><tbody id="historyBody"></tbody></table>
+    </div>
 </div>
 
 <script>
 const hsLib = {"4407.11":{name:"Structural Lumber",duty:10,surch:false},"4412.39":{name:"Plywood Sheets",duty:8,surch:true},"8301.40":{name:"Smart Locks",duty:3.5,surch:true}};
 let currentLang = 'en';
 const trans = {
-    en: { h1: "1. IMPORT SPECS", h2: "2. LOGISTICS", h3: "3. STRATEGY", lblNotes: "PROJECT / PRODUCT NOTES", lblHS: "HS / NCM CODE", lblOrigin: "Origin", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblManualDuty: "Import Duty (%)", lblFreight: "Total Freight ($)", lblIns: "Insurance (%)", lblInt: "Local Drayage ($)", lblOther: "Broker/Fees ($)", lblEx: "Exchange Rate ($1 = R$)", lblSurcharge: "Apply Brazil 40% Tax", lblMktUSA: "Market Price USA ($)", lblMktBR: "Market Price BR (R$)", lblMargin: "Desired Margin (%)", resUSA: "USA (IMPORT)", resBR: "BRAZIL (IMPORT)", txtLandedUSA: "LANDED COST (Unit)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "TARGET PRICE", lblTargetBR: "PREÇO ALVO", alertS232: "Lumber Alert: 10% S232 Active. Brazil 40% Tax EXEMPT." },
-    pt: { h1: "1. ESPECIFICAÇÕES", h2: "2. LOGÍSTICA", h3: "3. ESTRATÉGIA", lblNotes: "NOTAS DO PROJETO / PRODUTO", lblHS: "CÓDIGO HS / NCM", lblOrigin: "Origem", lblUnit: "Custo Unitário ($)", lblQty: "Quantidade", lblManualDuty: "Imposto Manual (%)", lblFreight: "Frete Total ($)", lblIns: "Seguro (%)", lblInt: "Frete Interno ($)", lblOther: "Taxas de Despacho ($)", lblEx: "Câmbio ($1 = R$)", lblSurcharge: "Aplicar 40% do Brasil", lblMktUSA: "Preço Mercado EUA ($)", lblMktBR: "Preço Mercado BR (R$)", lblMargin: "Margem Desejada (%)", resUSA: "EUA (IMPORTAÇÃO)", resBR: "BRASIL (IMPORTAÇÃO)", txtLandedUSA: "CUSTO REAL (Unid)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "PREÇO ALVO", lblTargetBR: "PREÇO ALVO", alertS232: "Madeira: 10% S232 Ativa. Isento de sobretaxa de 40%." }
+    en: { h1: "1. IMPORT SPECS", h2: "2. LOGISTICS", h3: "3. STRATEGY", hHistory: "HISTORY", thNotes: "Project", thLanded: "Landed", thTarget: "Target", lblNotes: "PROJECT / PRODUCT NOTES", lblHS: "HS / NCM CODE", lblOrigin: "Origin", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblManualDuty: "Duty Override (%)", lblFreight: "Total Freight ($)", lblIns: "Insurance (%)", lblInt: "Local Drayage ($)", lblOther: "Broker/Fees ($)", lblEx: "Exchange Rate (USD/BRL)", lblSurcharge: "Apply Brazil 40% Tax", lblMktUSA: "Market Price USA ($)", lblMktBR: "Market Price BR (R$)", lblMargin: "Desired Margin (%)", resUSA: "USA (IMPORT)", resBR: "BRAZIL (IMPORT)", txtLandedUSA: "LANDED COST (Unit)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "TARGET PRICE", lblTargetBR: "PREÇO ALVO", btnSave: "SAVE TO HISTORY", alertS232: "Lumber Alert: 10% S232 Active. Brazil 40% Tax EXEMPT." },
+    pt: { h1: "1. ESPECIFICAÇÕES", h2: "2. LOGÍSTICA", h3: "3. ESTRATÉGIA", hHistory: "HISTÓRICO", thNotes: "Projeto", thLanded: "Custo Real", thTarget: "Alvo", lblNotes: "NOTAS DO PROJETO / PRODUTO", lblHS: "CÓDIGO HS / NCM", lblOrigin: "Origem", lblUnit: "Custo Unitário ($)", lblQty: "Quantidade", lblManualDuty: "Imposto Manual (%)", lblFreight: "Frete Total ($)", lblIns: "Seguro (%)", lblInt: "Frete Interno ($)", lblOther: "Taxas de Despacho ($)", lblEx: "Câmbio (USD/BRL)", lblSurcharge: "Aplicar 40% do Brasil", lblMktUSA: "Preço Mercado EUA ($)", lblMktBR: "Preço Mercado BR (R$)", lblMargin: "Margem Desejada (%)", resUSA: "EUA (IMPORTAÇÃO)", resBR: "BRASIL (IMPORTAÇÃO)", txtLandedUSA: "CUSTO REAL (Unid)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "PREÇO ALVO", lblTargetBR: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO", alertS232: "Madeira: 10% S232 Ativa. Isento de sobretaxa de 40%." }
 };
 
-function clearZero(el) { if(el.value === "0") el.value = ""; }
+function clearZero(el) { if(el.value === "0" || el.value === "0.00") el.value = ""; }
+
 function autoCategory() {
     const hs = document.getElementById('hsCode').value.trim();
     const conv = document.getElementById('lumberConverter');
     const notes = document.getElementById('projNotes');
+    const dutyInput = document.getElementById('manualDuty');
+    const surcharge = document.getElementById('brSurcharge');
+    if (hs === "") {
+        notes.value = ""; dutyInput.value = "0"; surcharge.checked = true; conv.style.display = "none";
+        document.getElementById('tariffAlert').style.display = "none"; calculate(); return;
+    }
     conv.style.display = hs.startsWith("44") ? "block" : "none";
     if(hsLib[hs]) {
-        notes.value = hsLib[hs].name;
-        document.getElementById('manualDuty').value = hsLib[hs].duty;
-        document.getElementById('brSurcharge').checked = hsLib[hs].surch;
+        notes.value = hsLib[hs].name; dutyInput.value = hsLib[hs].duty; surcharge.checked = hsLib[hs].surch;
         if(!hsLib[hs].surch && document.getElementById('origin').value === 'Brazil') {
             document.getElementById('tariffAlert').innerText = trans[currentLang].alertS232;
             document.getElementById('tariffAlert').style.display = "block";
         }
     } else { document.getElementById('tariffAlert').style.display = "none"; }
-    calculate();
-}
-
-function convertWood() {
-    const val = parseFloat(document.getElementById('volInput').value) || 0;
-    const type = document.getElementById('convType').value;
-    document.getElementById('resBF').innerText = "BF: " + ((type === 'm3') ? val * 423.77 : val).toFixed(2);
-}
-
-function applyConversion() {
-    const val = parseFloat(document.getElementById('volInput').value) || 0;
-    const type = document.getElementById('convType').value;
-    document.getElementById('qty').value = Math.round((type === 'm3') ? val * 423.77 : val);
-    calculate();
-}
-
-function setLang(l) {
-    currentLang = l;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
-    const t = trans[l];
-    for (let id in t) { let el = document.getElementById(id); if (el) el.innerText = t[id]; }
     calculate();
 }
 
@@ -191,6 +189,47 @@ function calculate() {
     const totalBR = (cifBRL + ii + ipi + (cifBRL * 0.1175)) / (1 - icms);
     document.getElementById('landedBR').innerText = 'R$' + (totalBR / qty).toFixed(2);
     document.getElementById('reqBR').innerText = 'R$' + (totalBR / (qty * 0.74)).toFixed(2);
+}
+
+function saveToHistory() {
+    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
+    const entry = { notes: document.getElementById('projNotes').value || "Unnamed", landed: document.getElementById('landedUSA').innerText, target: document.getElementById('reqUSA').innerText };
+    history.unshift(entry);
+    localStorage.setItem('mavericksHistory', JSON.stringify(history.slice(0, 10)));
+    renderHistory();
+}
+
+function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
+    document.getElementById('historyBody').innerHTML = history.map((e, i) => `<tr><td>${e.notes}</td><td style="font-weight:bold">${e.landed}</td><td style="color:#1565c0">${e.target}</td><td><button onclick="deleteHistory(${i})" style="color:red; border:none; background:none; cursor:pointer">X</button></td></tr>`).join('');
+}
+
+function deleteHistory(i) {
+    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
+    history.splice(i, 1);
+    localStorage.setItem('mavericksHistory', JSON.stringify(history));
+    renderHistory();
+}
+
+function convertWood() {
+    const val = parseFloat(document.getElementById('volInput').value) || 0;
+    const type = document.getElementById('convType').value;
+    document.getElementById('resBF').innerText = "BF: " + ((type === 'm3') ? val * 423.77 : val).toFixed(2);
+}
+
+function applyConversion() {
+    const val = parseFloat(document.getElementById('volInput').value) || 0;
+    const type = document.getElementById('convType').value;
+    document.getElementById('qty').value = Math.round((type === 'm3') ? val * 423.77 : val);
+    calculate();
+}
+
+function setLang(l) {
+    currentLang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
+    const t = trans[l];
+    for (let id in t) { let el = document.getElementById(id); if (el) el.innerText = t[id]; }
+    renderHistory(); calculate();
 }
 
 async function getLiveExchangeRate() {
