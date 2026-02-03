@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mavericks Master V29</title>
+    <title>Mavericks Master V31</title>
     <style>
         :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; --alert: #ff9800; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; -webkit-font-smoothing: antialiased; }
         .container { max-width: 1200px; margin: auto; background: var(--white); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .v-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 300px; }
-        .lang-switch { display: flex; gap: 8px; }
+        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 320px; }
+        .lang-switch { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; }
         .lang-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
         .lang-btn.active { background: var(--primary); color: white; }
         .grid { display: flex; flex-direction: column; gap: 15px; }
@@ -37,12 +35,9 @@
 <body>
 
 <div class="container">
-    <div class="app-header">
-        <span class="v-badge">V29 - STABLE</span>
-        <div class="lang-switch">
-            <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
-            <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
-        </div>
+    <div class="lang-switch">
+        <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
+        <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
     </div>
 
     <div class="logo-container"><img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo"></div>
@@ -58,7 +53,8 @@
         <div class="card">
             <div class="header" id="h1">1. IMPORT SPECS</div>
             <div class="input-group"><label id="lblHS">HS / NCM CODE</label><input type="text" id="hsCode" placeholder="Code Search" oninput="autoCategory()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblOrigin">Origin</label>
+            <div class="input-group">
+                <label id="lblOrigin">Origin</label>
                 <select id="origin" onchange="calculate()">
                     <option value="Brazil">Brazil</option>
                     <option value="China">China</option>
@@ -77,8 +73,8 @@
             <div class="input-group"><label id="lblInt">Local Drayage ($)</label><input type="number" id="internalFreight" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div class="input-group"><label id="lblOther">Broker/Fees ($)</label><input type="number" id="otherFees" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div style="font-size:0.6rem; color:#666; padding-top:5px; border-top:1px solid #eee;">
-                BR TAXES: IPI % <input type="number" id="brIPI" value="5" oninput="calculate()" onclick="clearZero(this)" style="width:35px;"> 
-                ICMS % <input type="number" id="brICMS" value="18" oninput="calculate()" onclick="clearZero(this)" style="width:35px;">
+                BR TAXES: IPI % <input type="number" id="brIPI" value="5" oninput="calculate()" onclick="clearZero(this)" style="width:40px;"> 
+                ICMS % <input type="number" id="brICMS" value="18" oninput="calculate()" onclick="clearZero(this)" style="width:40px;">
             </div>
         </div>
 
@@ -88,8 +84,8 @@
             <div class="input-group"><label id="lblEx">Exchange Rate (USD/BRL)</label>
                 <div style="display:flex; gap:3px;"><input type="number" id="exRate" value="5.26" step="0.01" oninput="calculate()" onclick="clearZero(this)"><button onclick="getLiveExchangeRate()">🔄</button></div>
             </div>
-            <div class="input-group"><label id="lblMktUSA">Market Price USA ($)</label><input type="number" id="priceUSA" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblMktBR">Market Price BR (R$)</label><input type="number" id="priceBR" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
+            <div class="input-group"><label id="lblMktUSA">Market USA ($)</label><input type="number" id="priceUSA" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
+            <div class="input-group"><label id="lblMktBR">Market BR (R$)</label><input type="number" id="priceBR" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
             <div style="font-size:0.6rem; margin-top:5px;">
                 <input type="checkbox" id="brSurcharge" onchange="calculate()" checked style="width:auto;"> <span id="lblSurcharge">Apply Brazil 40% Tax</span>
             </div>
@@ -128,14 +124,26 @@
 </div>
 
 <script>
-const hsLib = {"4407.11":{name:"Structural Lumber",duty:10,surch:false},"4412.39":{name:"Plywood Sheets",duty:8,surch:true},"8301.40":{name:"Smart Locks",duty:3.5,surch:true}};
-let currentLang = 'en';
-const trans = {
-    en: { h1: "1. IMPORT SPECS", h2: "2. LOGISTICS", h3: "3. STRATEGY", hHistory: "HISTORY", thNotes: "Project", thLanded: "Landed", thTarget: "Target", lblNotes: "PROJECT / PRODUCT NOTES", lblHS: "HS / NCM CODE", lblOrigin: "Origin", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblManualDuty: "Duty Override (%)", lblFreight: "Total Freight ($)", lblIns: "Insurance (%)", lblInt: "Local Drayage ($)", lblOther: "Broker/Fees ($)", lblEx: "Exchange Rate (USD/BRL)", lblSurcharge: "Apply Brazil 40% Tax", lblMktUSA: "Market Price USA ($)", lblMktBR: "Market Price BR (R$)", lblMargin: "Desired Margin (%)", resUSA: "USA (IMPORT)", resBR: "BRAZIL (IMPORT)", txtLandedUSA: "LANDED COST (Unit)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "TARGET PRICE", lblTargetBR: "PREÇO ALVO", btnSave: "SAVE TO HISTORY", alertS232: "Lumber Alert: 10% S232 Active. Brazil 40% Tax EXEMPT." },
-    pt: { h1: "1. ESPECIFICAÇÕES", h2: "2. LOGÍSTICA", h3: "3. ESTRATÉGIA", hHistory: "HISTÓRICO", thNotes: "Projeto", thLanded: "Custo Real", thTarget: "Alvo", lblNotes: "NOTAS DO PROJETO / PRODUTO", lblHS: "CÓDIGO HS / NCM", lblOrigin: "Origem", lblUnit: "Custo Unitário ($)", lblQty: "Quantidade", lblManualDuty: "Imposto Manual (%)", lblFreight: "Frete Total ($)", lblIns: "Seguro (%)", lblInt: "Frete Interno ($)", lblOther: "Taxas de Despacho ($)", lblEx: "Câmbio (USD/BRL)", lblSurcharge: "Aplicar 40% do Brasil", lblMktUSA: "Preço Mercado EUA ($)", lblMktBR: "Preço Mercado BR (R$)", lblMargin: "Margem Desejada (%)", resUSA: "EUA (IMPORTAÇÃO)", resBR: "BRASIL (IMPORTAÇÃO)", txtLandedUSA: "CUSTO REAL (Unid)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "PREÇO ALVO", lblTargetBR: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO", alertS232: "Madeira: 10% S232 Ativa. Isento de sobretaxa de 40%." }
+// UPDATED MASTER LIBRARY 2026
+const hsLibrary = {
+    "4407.11": { name: "Structural Lumber", duty: 10, surcharge: false },
+    "4412.39": { name: "Plywood Sheets", duty: 8, surcharge: true },
+    "8301.40": { name: "Smart Digital Locks", duty: 3.5, surcharge: true },
+    "0201.10.00": { name: "Bovino Carcaça Fresca", duty: 12, surcharge: true },
+    "0301.11.10": { name: "Peixe Aruanã Vivo", duty: 10, surcharge: true },
+    "0901.21.00": { name: "Café Torrado", duty: 15, surcharge: true },
+    "2520.20.90": { name: "Gesso Construção", duty: 5, surcharge: true },
+    "8518.30.00": { name: "Wireless Audio/Earbuds", duty: 0, surcharge: true },
+    "9403.40.00": { name: "Kitchen Cabinets (Wood)", duty: 25, surcharge: false }
 };
 
-function clearZero(el) { if(el.value === "0" || el.value === "0.00") el.value = ""; }
+let currentLang = 'en';
+const trans = {
+    en: { h1: "1. IMPORT SPECS", h2: "2. LOGISTICS", h3: "3. STRATEGY", hHistory: "HISTORY", thNotes: "Project", thLanded: "Landed", thTarget: "Target", lblNotes: "PROJECT / PRODUCT NOTES", lblHS: "HS / NCM CODE", lblOrigin: "Origin", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblManualDuty: "Duty Override (%)", lblFreight: "Total Freight ($)", lblIns: "Insurance (%)", lblInt: "Local Drayage ($)", lblOther: "Broker/Fees ($)", lblEx: "Exchange Rate (USD/BRL)", lblSurcharge: "Apply Brazil 40% Tax", lblMktUSA: "Market USA ($)", lblMktBR: "Market BR (R$)", lblMargin: "Margin (%)", resUSA: "USA (IMPORT)", resBR: "BRAZIL (IMPORT)", txtLandedUSA: "LANDED COST (Unit)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "TARGET PRICE", lblTargetBR: "PREÇO ALVO", btnSave: "SAVE TO HISTORY", alertS232: "Lumber Alert: 10% S232 Active. Brazil 40% Tax EXEMPT." },
+    pt: { h1: "1. ESPECIFICAÇÕES", h2: "2. LOGÍSTICA", h3: "3. ESTRATÉGIA", hHistory: "HISTÓRICO", thNotes: "Projeto", thLanded: "Custo Real", thTarget: "Alvo", lblNotes: "NOTAS DO PROJETO / PRODUTO", lblHS: "CÓDIGO HS / NCM", lblOrigin: "Origem", lblUnit: "Custo Unitário ($)", lblQty: "Quantidade", lblManualDuty: "Imposto Manual (%)", lblFreight: "Frete Total ($)", lblIns: "Seguro (%)", lblInt: "Frete Interno ($)", lblOther: "Taxas de Despacho ($)", lblEx: "Câmbio (USD/BRL)", lblSurcharge: "Aplicar 40% do Brasil", lblMktUSA: "Preço Mercado EUA ($)", lblMktBR: "Preço Mercado BR (R$)", lblMargin: "Margem (%)", resUSA: "EUA (IMPORTAÇÃO)", resBR: "BRASIL (IMPORTAÇÃO)", txtLandedUSA: "CUSTO REAL (Unid)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "PREÇO ALVO", lblTargetBR: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO", alertS232: "Madeira: 10% S232 Ativa. Isento de sobretaxa de 40%." }
+};
+
+function clearZero(el) { if(el.value === "0") el.value = ""; }
 
 function autoCategory() {
     const hs = document.getElementById('hsCode').value.trim();
@@ -143,14 +151,19 @@ function autoCategory() {
     const notes = document.getElementById('projNotes');
     const dutyInput = document.getElementById('manualDuty');
     const surcharge = document.getElementById('brSurcharge');
+
     if (hs === "") {
         notes.value = ""; dutyInput.value = "0"; surcharge.checked = true; conv.style.display = "none";
         document.getElementById('tariffAlert').style.display = "none"; calculate(); return;
     }
+
     conv.style.display = hs.startsWith("44") ? "block" : "none";
-    if(hsLib[hs]) {
-        notes.value = hsLib[hs].name; dutyInput.value = hsLib[hs].duty; surcharge.checked = hsLib[hs].surch;
-        if(!hsLib[hs].surch && document.getElementById('origin').value === 'Brazil') {
+
+    if(hsLibrary[hs]) {
+        notes.value = hsLibrary[hs].name;
+        dutyInput.value = hsLibrary[hs].duty;
+        surcharge.checked = hsLibrary[hs].surcharge;
+        if(!hsLibrary[hs].surcharge && document.getElementById('origin').value === 'Brazil') {
             document.getElementById('tariffAlert').innerText = trans[currentLang].alertS232;
             document.getElementById('tariffAlert').style.display = "block";
         }
@@ -182,11 +195,13 @@ function calculate() {
     document.getElementById('landedUSA').innerText = '$' + landedUSA.toFixed(2);
     document.getElementById('reqUSA').innerText = '$' + (landedUSA / 0.77).toFixed(2);
 
+    // CASCADE BR TAX LOGIC
     const cifBRL = cifBatch * exRate;
     const ii = cifBRL * 0.12;
     const ipi = (cifBRL + ii) * (parseFloat(document.getElementById('brIPI').value)/100);
-    const icms = (parseFloat(document.getElementById('brICMS').value)/100);
-    const totalBR = (cifBRL + ii + ipi + (cifBRL * 0.1175)) / (1 - icms);
+    const icmsRate = (parseFloat(document.getElementById('brICMS').value)/100);
+    const totalBR = (cifBRL + ii + ipi + (cifBRL * 0.1175)) / (1 - icmsRate);
+
     document.getElementById('landedBR').innerText = 'R$' + (totalBR / qty).toFixed(2);
     document.getElementById('reqBR').innerText = 'R$' + (totalBR / (qty * 0.74)).toFixed(2);
 }
