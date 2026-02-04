@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mavericks Master V49</title>
+    <title>Mavericks Master V50</title>
     <style>
         :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
@@ -50,74 +50,62 @@
         <div class="card">
             <div class="header" id="h1">STEP 1: PRODUCT IDENTITY</div>
             <div class="input-group"><label id="lblNotes">Project Name</label><input type="text" id="projNotes"></div>
-            <div class="input-group"><label id="lblHS">Classification Code (NCM)</label><input type="text" id="hsCode" oninput="autoCategory()"></div>
+            <div class="input-group"><label id="lblHS">Classification Code (NCM/HS)</label><input type="text" id="hsCode" oninput="autoCategory()"></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label id="lblUnit">Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
-                <div><label id="lblQty">Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onfocus="if(this.value=='1')this.value=''"></div>
+                <div><label id="lblUnit">Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()"></div>
+                <div><label id="lblQty">Quantity</label><input type="number" id="qty" value="1" oninput="calculate()"></div>
             </div>
         </div>
 
         <div class="card">
-            <div class="header" id="h2">STEP 2: WEIGHT & DIMENSIONS</div>
-            <div class="toggle-box">
-                <span id="lblDimToggle" style="font-weight:bold;">USE DIMENSIONAL?</span>
-                <label class="switch"><input type="checkbox" id="useDim" onchange="calculate()"><span class="slider"></span></label>
+            <div class="header" id="h3">STEP 2: LOGISTICS & ORIGIN</div>
+            <div class="input-group"><label id="lblOrigin">Origin</label>
+                <select id="origin" onchange="calculate()">
+                    <option value="China">China</option>
+                    <option value="Other">Other International</option>
+                </select>
             </div>
-            <div class="input-group"><label id="lblWeight">Weight (lb)</label><input type="number" id="uWeight" value="0" oninput="calculate()"></div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-                <input type="number" id="uL" value="0" oninput="calculate()" placeholder="L">
-                <input type="number" id="uW" value="0" oninput="calculate()" placeholder="W">
-                <input type="number" id="uH" value="0" oninput="calculate()" placeholder="H">
-            </div>
-            <div id="lumberTool" style="display:none; margin-top:10px; padding:10px; border:1px dashed var(--secondary); border-radius:8px;">
-                <label style="color:var(--secondary)">Cubic Meters (m 
-                    3
-                     ) to Board Feet (BF)</label>
-                <input type="number" id="m3Input" oninput="convertLumber()" placeholder="m³" style="height:40px;">
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="header" id="h3">STEP 3: LOGISTICS & FEES</div>
-            <div class="input-group"><label id="lblOrigin">Origin</label><select id="origin" onchange="calculate()"><option value="China">China</option><option value="Brazil">Brazil</option></select></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label id="lblFreight">Total Freight ($)</label><input type="number" id="freight" value="0" oninput="calculate()"></div>
-                <div><label id="lblBuffer">Handling Buffer ($)</label><input type="number" id="buffer" value="50" oninput="calculate()"></div>
+                <div><label id="lblInsurance">Insurance ($)</label><input type="number" id="insurance" value="0" oninput="calculate()"></div>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+            <div id="chinaExtra" class="toggle-box" style="margin-top:10px; border: 1px solid #ffcdd2; display: none;">
+                <span style="color:#c62828; font-size: 0.7rem; font-weight:bold;">SEC 301 TARIFF? (+25%)</span>
+                <label class="switch"><input type="checkbox" id="sec301" onchange="calculate()"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="header" id="h4">STEP 3: TAX & MARKETPLACE</div>
+            <div class="input-group"><label id="lblMkt">Platform</label>
+                <select id="mktSelect" onchange="calculate()">
+                    <option value="amazon">Amazon (USA)</option>
+                    <option value="meli">Mercado Livre (BR)</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div><label id="lblDuty">Duty (%)</label><input type="number" id="manualDuty" value="3.5" oninput="calculate()"></div>
                 <div><label id="lblEx">Exchange Rate</label><input type="number" id="exRate" value="5.26" oninput="calculate()"></div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="header" id="h4">STEP 4: SALES STRATEGY</div>
-            <div class="toggle-box" id="meliRow" style="display:none;">
-                <span style="font-size:0.7rem; font-weight:bold;">ML PREMIUM (+5%)</span>
-                <label class="switch"><input type="checkbox" id="mlPremium" onchange="calculate()"><span class="slider"></span></label>
-            </div>
-            <div class="input-group"><label id="lblMkt">Platform</label>
-                <select id="mktSelect" onchange="toggleMeli(); calculate()"><option value="amazon">Amazon (USA)</option><option value="meli">Mercado Livre (BR)</option></select>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div><label id="lblMktFee">Comm. (%)</label><input type="number" id="mktFee" value="15" oninput="calculate()"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                 <div><label id="lblMargin">Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()"></div>
+                <div><label id="lblMktFee">Comm. (%)</label><input type="number" id="mktFee" value="15" oninput="calculate()"></div>
             </div>
-            <div class="input-group" style="margin-top:10px;"><label id="lblPP">Final Shipping ($/R$)</label><input type="number" id="pickPack" value="0" oninput="calculate()"></div>
         </div>
     </div>
 
     <div class="results-area">
         <div class="result-card" style="border-top: 10px solid var(--primary);">
-            <strong id="resUSAHeader" style="color:var(--primary);">USA BREAKDOWN</strong>
+            <strong id="resUSAHeader">TOTAL BREAKDOWN</strong>
             <table class="breakdown-table">
                 <tr><td>Factory Unit Cost</td><td id="brkFactory">$0.00</td></tr>
-                <tr><td>Logistics (Freight + Buffer)</td><td id="brkLog">$0.00</td></tr>
-                <tr><td>Government Duties</td><td id="brkDuty">$0.00</td></tr>
-                <tr><td>Marketplace Fees</td><td id="brkMkt">$0.00</td></tr>
+                <tr><td>Logistics per Unit</td><td id="brkLog">$0.00</td></tr>
+                <tr><td>All Taxes & Duties</td><td id="brkDuty">$0.00</td></tr>
+                <tr><td>Exchange Rate Applied</td><td id="brkEx">1.00</td></tr>
             </table>
             <div class="highlight"><label id="resUSALabel">TOTAL LANDED COST</label><span class="val" id="landedUSA">$0.00</span></div>
-            <div style="text-align:center; font-weight:bold; color:var(--primary);" id="resUSATarget">TARGET RETAIL</div><span class="val" id="reqUSA" style="color:var(--primary); text-align:center;">$0.00</span>
+            <div style="text-align:center; font-weight:bold; color:var(--primary);" id="resUSATarget">TARGET RETAIL</div>
+            <span class="val" id="reqUSA" style="color:var(--primary); text-align:center;">$0.00</span>
         </div>
     </div>
     
@@ -128,12 +116,10 @@
 <script>
 let currentLang = 'en';
 const trans = {
-    en: { h1: "STEP 1: IDENTITY", h2: "STEP 2: PHYSICAL", h3: "STEP 3: LOGISTICS", h4: "STEP 4: STRATEGY", lblNotes: "Project Name", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblWeight: "Weight (lb)", lblFreight: "Total Freight ($)", lblBuffer: "Handling Buffer ($)", lblDuty: "Duty (%)", lblMkt: "Platform", lblMktFee: "Comm. (%)", lblMargin: "Margin (%)", lblPP: "Final Shipping ($/R$)", resUSAHeader: "USA BREAKDOWN", resUSALabel: "TOTAL LANDED COST", resUSATarget: "TARGET RETAIL", btnSave: "SAVE TO HISTORY" },
-    pt: { h1: "PASSO 1: IDENTIDADE", h2: "PASSO 2: FÍSICO", h3: "PASSO 3: LOGÍSTICA", h4: "PASSO 4: ESTRATÉGIA", lblNotes: "Nome do Projeto", lblUnit: "Custo Fábrica ($)", lblQty: "Quantidade", lblWeight: "Peso (lb)", lblFreight: "Frete Total ($)", lblBuffer: "Margem Manuseio ($)", lblDuty: "Imposto (%)", lblMkt: "Plataforma", lblMktFee: "Comis. (%)", lblMargin: "Margem (%)", lblPP: "Envio Final ($/R$)", resUSAHeader: "DETALHAMENTO EUA", resUSALabel: "CUSTO TOTAL IMPORTADO", resUSATarget: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO" }
+    en: { h1: "STEP 1: IDENTITY", h3: "STEP 2: LOGISTICS", h4: "STEP 3: STRATEGY", lblNotes: "Project Name", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblFreight: "Total Freight ($)", lblInsurance: "Insurance ($)", lblDuty: "Duty (%)", lblMkt: "Platform", lblMktFee: "Comm. (%)", lblMargin: "Margin (%)", resUSAHeader: "TOTAL BREAKDOWN", resUSALabel: "TOTAL LANDED COST", resUSATarget: "TARGET RETAIL", btnSave: "SAVE TO HISTORY" },
+    pt: { h1: "PASSO 1: IDENTIDADE", h3: "PASSO 2: LOGÍSTICA", h4: "PASSO 3: ESTRATÉGIA", lblNotes: "Nome do Projeto", lblUnit: "Custo Fábrica ($)", lblQty: "Quantidade", lblFreight: "Frete Total ($)", lblInsurance: "Seguro ($)", lblDuty: "Imposto (%)", lblMkt: "Plataforma", lblMktFee: "Comis. (%)", lblMargin: "Margem (%)", resUSAHeader: "DETALHAMENTO TOTAL", resUSALabel: "CUSTO TOTAL IMPORTADO", resUSATarget: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO" }
 };
 
-function toggleMeli() { document.getElementById('meliRow').style.display = (document.getElementById('mktSelect').value === 'meli') ? 'flex' : 'none'; }
-function clearZero(el) { if(el.value === "0") el.value = ""; }
 function setLang(l) {
     currentLang = l;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
@@ -145,50 +131,68 @@ function calculate() {
     const buy = parseFloat(document.getElementById('unitCost').value) || 0;
     const qty = parseFloat(document.getElementById('qty').value) || 1;
     const freight = parseFloat(document.getElementById('freight').value) || 0;
-    const buffer = parseFloat(document.getElementById('buffer').value) || 0;
+    const insurance = parseFloat(document.getElementById('insurance').value) || 0;
     const dutyRate = (parseFloat(document.getElementById('manualDuty').value) || 0) / 100;
+    const exRate = parseFloat(document.getElementById('exRate').value) || 1;
     const margin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
-    const pp = parseFloat(document.getElementById('pickPack').value) || 0;
-    let mktRate = (parseFloat(document.getElementById('mktFee').value) || 0) / 100;
-    if(document.getElementById('mktSelect').value === 'meli' && document.getElementById('mlPremium').checked) mktRate += 0.05;
+    const mktRate = (parseFloat(document.getElementById('mktFee').value) || 0) / 100;
 
-    if (buy === 0) {
-        document.getElementById('landedUSA').innerText = '$0.00';
-        document.getElementById('reqUSA').innerText = '$0.00';
-        return;
+    const isChina = document.getElementById('origin').value === 'China';
+    const isBrazil = document.getElementById('mktSelect').value === 'meli';
+    const sec301 = document.getElementById('sec301').checked ? 0.25 : 0;
+    
+    document.getElementById('chinaExtra').style.display = isChina ? 'flex' : 'none';
+
+    if (buy === 0) return;
+
+    const unitLogistics = (freight + insurance) / qty;
+    let totalTaxPerUnit = 0;
+
+    if (!isBrazil) {
+        // USA Calculation (FOB)
+        totalTaxPerUnit = (buy * dutyRate) + (isChina ? (buy * sec301) : 0);
+    } else {
+        // Brazil Calculation (CIF Cascading)
+        const cif = buy + unitLogistics;
+        const ii = cif * dutyRate;
+        const ipi = (cif + ii) * 0.10; 
+        const pisCofins = cif * 0.0925;
+        const icms = (cif + ii + ipi + pisCofins) / (1 - 0.18) * 0.18;
+        totalTaxPerUnit = ii + ipi + pisCofins + icms;
     }
 
-    const unitFreight = freight / qty;
-    const unitBuffer = buffer / qty;
-    const unitDuty = (buy + unitFreight) * dutyRate;
-    const landedUSA = buy + unitFreight + unitDuty + unitBuffer;
-    const reqUSA = (landedUSA + pp) / (1 - mktRate - margin);
+    const landedUSD = buy + unitLogistics + totalTaxPerUnit;
+    const landedFinal = isBrazil ? (landedUSD * exRate) : landedUSD;
+    const targetRetail = landedFinal / (1 - mktRate - margin);
 
-    document.getElementById('landedUSA').innerText = '$' + landedUSA.toFixed(2);
-    document.getElementById('reqUSA').innerText = '$' + reqUSA.toFixed(2);
-    document.getElementById('brkFactory').innerText = '$' + buy.toFixed(2);
-    document.getElementById('brkLog').innerText = '$' + (unitFreight + unitBuffer).toFixed(2);
-    document.getElementById('brkDuty').innerText = '$' + unitDuty.toFixed(2);
-    document.getElementById('brkMkt').innerText = '$' + (reqUSA * mktRate).toFixed(2);
+    const symbol = isBrazil ? 'R$ ' : '$ ';
+    document.getElementById('landedUSA').innerText = symbol + landedFinal.toFixed(2);
+    document.getElementById('reqUSA').innerText = symbol + targetRetail.toFixed(2);
+    document.getElementById('brkFactory').innerText = '$ ' + buy.toFixed(2);
+    document.getElementById('brkLog').innerText = '$ ' + unitLogistics.toFixed(2);
+    document.getElementById('brkDuty').innerText = '$ ' + totalTaxPerUnit.toFixed(2);
+    document.getElementById('brkEx').innerText = isBrazil ? exRate.toFixed(2) : "1.00 (USD)";
 }
 
 function autoCategory() {
     const hs = document.getElementById('hsCode').value;
-    document.getElementById('lumberTool').style.display = hs.startsWith('44') ? 'block' : 'none';
-    if(hs === "8301.40") { document.getElementById('manualDuty').value = 3.5; }
+    if(hs.startsWith('72') || hs.startsWith('73')) { // Steel
+        document.getElementById('manualDuty').value = 25;
+        document.getElementById('sec301').checked = true;
+    }
     calculate();
 }
-function convertLumber() {
-    const m3 = parseFloat(document.getElementById('m3Input').value) || 0;
-    document.getElementById('qty').value = Math.round(m3 * 423.77);
-    calculate();
-}
+
 function saveToHistory() {
     const list = document.getElementById('historyList');
     const entry = document.createElement('div');
-    entry.innerText = `${new Date().toLocaleTimeString()} - ${document.getElementById('projNotes').value || 'Calc'}: ${document.getElementById('reqUSA').innerText}`;
+    const name = document.getElementById('projNotes').value || 'Calc';
+    entry.style.padding = "5px 0";
+    entry.style.borderBottom = "1px solid #eee";
+    entry.innerText = `${new Date().toLocaleTimeString()} - ${name}: ${document.getElementById('reqUSA').innerText}`;
     list.prepend(entry);
 }
+
 window.onload = () => setLang('en');
 </script>
 </body>
