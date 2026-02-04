@@ -3,40 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mavericks Master V45</title>
+    <title>Mavericks Master V49</title>
     <style>
         :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1200px; margin: auto; background: var(--white); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
+        .container { max-width: 900px; margin: 10px auto; background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 220px; }
+        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 200px; }
         .lang-btn { background: #eee; border: none; padding: 12px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .lang-btn.active { background: var(--primary); color: white; }
-
         .grid { display: flex; flex-direction: column; gap: 20px; }
         @media (min-width: 768px) { .grid { display: grid; grid-template-columns: 1fr 1fr; } }
-        
         .card { padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .header { background: var(--primary); color: white; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; font-size: 0.85rem; text-align: center; }
-        
-        /* UPDATED INPUTS - 60PX HEIGHT */
         .input-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 6px; color: #444; font-size: 0.75rem; text-transform: uppercase; }
-        input, select, textarea { 
-            width: 100%; 
-            height: 60px; /* Enhanced height for better touch targets */
-            padding: 0 15px; 
-            border: 2px solid #ddd; 
-            border-radius: 12px; 
-            font-size: 20px; /* Larger text for high visibility */
-            box-sizing: border-box; 
-            background: #fff;
-            -webkit-appearance: none;
-        }
-        textarea { height: auto; padding: 15px; }
-        input:focus { border-color: var(--primary); outline: none; }
-        
+        input, select { width: 100%; height: 60px; padding: 0 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 18px; box-sizing: border-box; background: #fff; }
         .toggle-box { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
         .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -44,15 +26,13 @@
         .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--secondary); }
         input:checked + .slider:before { transform: translateX(30px); }
-
         .results-area { display: flex; flex-direction: column; gap: 20px; margin-top: 30px; border-top: 3px solid #eee; padding-top: 25px; }
-        @media (min-width: 768px) { .results-area { display: grid; grid-template-columns: 1fr 1fr; } }
-        .result-card { padding: 25px; border-radius: 20px; background: #fff; border: 2px solid #eee; }
+        .result-card { padding: 20px; border-radius: 20px; background: #fff; border: 2px solid #eee; }
         .highlight { background: var(--accent); padding: 15px; border-radius: 12px; border: 2px solid #fbc02d; margin: 15px 0; text-align: center; }
         .val { font-size: 2.2rem; font-weight: 900; color: #111; display: block; }
-        
-        .action-btn { background: var(--secondary); color: white; border: none; padding: 20px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
-        .history-card { margin-top: 20px; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; font-size: 0.8rem; }
+        .breakdown-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.8rem; background: #f9f9f9; border-radius: 10px; overflow: hidden; }
+        .breakdown-table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .action-btn { background: var(--secondary); color: white; border: none; padding: 20px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2rem; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -61,78 +41,97 @@
     <div class="app-header">
         <div class="logo-container"><img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo"></div>
         <div class="lang-switch">
-            <button onclick="setLang('en')" id="btnEN" class="lang-btn active">English</button>
-            <button onclick="setLang('pt')" id="btnPT" class="lang-btn">Português</button>
+            <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
+            <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
         </div>
     </div>
 
     <div class="grid">
         <div class="card">
             <div class="header" id="h1">STEP 1: PRODUCT IDENTITY</div>
-            <div class="input-group"><label id="lblNotes">Product or Project Name</label><input type="text" id="projNotes" placeholder="..."></div>
-            <div class="input-group"><label id="lblHS">Classification Code (NCM)</label><input type="text" id="hsCode" oninput="autoCategory()" placeholder="..."></div>
-            <div class="input-group"><label id="lblUnit">Factory Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
-            <div class="input-group"><label id="lblQty">Total Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div class="input-group"><label id="lblNotes">Project Name</label><input type="text" id="projNotes"></div>
+            <div class="input-group"><label id="lblHS">Classification Code (NCM)</label><input type="text" id="hsCode" oninput="autoCategory()"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label id="lblUnit">Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+                <div><label id="lblQty">Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onfocus="if(this.value=='1')this.value=''"></div>
+            </div>
         </div>
 
         <div class="card">
             <div class="header" id="h2">STEP 2: WEIGHT & DIMENSIONS</div>
             <div class="toggle-box">
-                <span id="lblDimToggle" style="font-weight:bold;">CALCULATE VOLUME SPACE?</span>
+                <span id="lblDimToggle" style="font-weight:bold;">USE DIMENSIONAL?</span>
                 <label class="switch"><input type="checkbox" id="useDim" onchange="calculate()"><span class="slider"></span></label>
             </div>
-            <div class="input-group"><label id="lblWeight">Weight (lb)</label><input type="number" id="uWeight" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div class="input-group"><label id="lblWeight">Weight (lb)</label><input type="number" id="uWeight" value="0" oninput="calculate()"></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                 <input type="number" id="uL" value="0" oninput="calculate()" placeholder="L">
                 <input type="number" id="uW" value="0" oninput="calculate()" placeholder="W">
                 <input type="number" id="uH" value="0" oninput="calculate()" placeholder="H">
             </div>
+            <div id="lumberTool" style="display:none; margin-top:10px; padding:10px; border:1px dashed var(--secondary); border-radius:8px;">
+                <label style="color:var(--secondary)">LUMBER: m³ TO BF</label>
+                <input type="number" id="m3Input" oninput="convertLumber()" placeholder="m³" style="height:40px;">
+            </div>
         </div>
 
         <div class="card">
-            <div class="header" id="h3">STEP 3: LOGISTICS COSTS</div>
-            <div class="input-group"><label id="lblOrigin">Origin Country</label><select id="origin" onchange="calculate()"><option value="China">China</option><option value="Brazil">Brazil</option></select></div>
-            <div class="input-group"><label id="lblFreight">Intl Freight ($)</label><input type="number" id="freight" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
-            <div style="font-size:0.7rem; background:#f0f0f0; padding:15px; border-radius:12px; margin-top:10px;">
-                BRAZIL IMPOSTOS: IPI    <input type="number" id="brIPI" value="5" oninput="calculate()" style="width:70px; height:30px; font-size:14px;">%    |  ICMS <input type="number" id="brICMS" value="18" oninput="calculate()" style="width:70px; height:30px; font-size:14px;">%
+            <div class="header" id="h3">STEP 3: LOGISTICS & FEES</div>
+            <div class="input-group"><label id="lblOrigin">Origin</label><select id="origin" onchange="calculate()"><option value="China">China</option><option value="Brazil">Brazil</option></select></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label id="lblFreight">Total Freight ($)</label><input type="number" id="freight" value="0" oninput="calculate()"></div>
+                <div><label id="lblBuffer">Handling Buffer ($)</label><input type="number" id="buffer" value="50" oninput="calculate()"></div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <div><label id="lblDuty">Duty (%)</label><input type="number" id="manualDuty" value="3.5" oninput="calculate()"></div>
+                <div><label id="lblEx">Exchange Rate</label><input type="number" id="exRate" value="5.26" oninput="calculate()"></div>
             </div>
         </div>
 
         <div class="card">
             <div class="header" id="h4">STEP 4: SALES STRATEGY</div>
-            <div class="input-group">
-                <select id="mktSelect" onchange="calculate()"><option value="amazon">Amazon (USA)</option><option value="meli">Mercado Livre (BR)</option></select>
+            <div class="toggle-box" id="meliRow" style="display:none;">
+                <span style="font-size:0.7rem; font-weight:bold;">ML PREMIUM (+5%)</span>
+                <label class="switch"><input type="checkbox" id="mlPremium" onchange="calculate()"><span class="slider"></span></label>
             </div>
-            <div class="input-group"><label id="lblMktFee">Platform Commission (%)</label><input type="number" id="mktFee" value="15" oninput="calculate()"></div>
-            <div class="input-group"><label id="lblPP">Shipping to Customer ($/R$)</label><input type="number" id="pickPack" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
-            <div class="input-group"><label id="lblMargin">Profit Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()"></div>
+            <div class="input-group"><label id="lblMkt">Platform</label>
+                <select id="mktSelect" onchange="toggleMeli(); calculate()"><option value="amazon">Amazon (USA)</option><option value="meli">Mercado Livre (BR)</option></select>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label id="lblMktFee">Comm. (%)</label><input type="number" id="mktFee" value="15" oninput="calculate()"></div>
+                <div><label id="lblMargin">Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()"></div>
+            </div>
+            <div class="input-group" style="margin-top:10px;"><label id="lblPP">Final Shipping ($/R$)</label><input type="number" id="pickPack" value="0" oninput="calculate()"></div>
         </div>
     </div>
 
     <div class="results-area">
-        <div class="result-card" style="border-top: 8px solid var(--primary);">
-            <strong id="resUSAHeader" style="color:var(--primary);">USA MARKET</strong>
+        <div class="result-card" style="border-top: 10px solid var(--primary);">
+            <strong id="resUSAHeader" style="color:var(--primary);">USA BREAKDOWN</strong>
+            <table class="breakdown-table">
+                <tr><td>Factory Unit Cost</td><td id="brkFactory">$0.00</td></tr>
+                <tr><td>Logistics (Freight + Buffer)</td><td id="brkLog">$0.00</td></tr>
+                <tr><td>Government Duties</td><td id="brkDuty">$0.00</td></tr>
+                <tr><td>Marketplace Fees</td><td id="brkMkt">$0.00</td></tr>
+            </table>
             <div class="highlight"><label id="resUSALabel">TOTAL LANDED COST</label><span class="val" id="landedUSA">$0.00</span></div>
-            <div id="resUSATarget" style="font-weight:bold; color:var(--primary)">SUGGESTED RETAIL</div><span class="val" id="reqUSA" style="color:var(--primary)">$0.00</span>
-        </div>
-        <div class="result-card" style="border-top: 8px solid var(--secondary);">
-            <strong id="resBRHeader" style="color:var(--secondary);">BRAZIL MARKET</strong>
-            <div class="highlight"><label id="resBRLabel">CUSTO TOTAL IMPORTADO</label><span class="val" id="landedBR">R$0.00</span></div>
-            <div id="resBRTarget" style="font-weight:bold; color:var(--secondary)">PREÇO SUGERIDO</div><span class="val" id="reqBR" style="color:var(--secondary)">R$0.00</span>
+            <div style="text-align:center; font-weight:bold; color:var(--primary);" id="resUSATarget">TARGET RETAIL</div><span class="val" id="reqUSA" style="color:var(--primary); text-align:center;">$0.00</span>
         </div>
     </div>
     
     <button class="action-btn" onclick="saveToHistory()" id="btnSave">SAVE TO HISTORY</button>
-    <div id="historyList" class="history-card"></div>
+    <div id="historyList" style="margin-top:20px; font-size:0.8rem; border-top:1px solid #ddd; padding-top:10px;"></div>
 </div>
 
 <script>
 let currentLang = 'en';
 const trans = {
-    en: { h1: "STEP 1: PRODUCT IDENTITY", h2: "STEP 2: WEIGHT & DIMENSIONS", h3: "STEP 3: LOGISTICS COSTS", h4: "STEP 4: SALES STRATEGY", lblNotes: "Product or Project Name", lblHS: "Classification Code (NCM)", lblUnit: "Factory Unit Cost ($)", lblQty: "Total Quantity", lblDimToggle: "CALCULATE VOLUME SPACE?", lblWeight: "Unit Weight (lb)", lblOrigin: "Origin Country", lblFreight: "Intl Freight ($)", lblMktFee: "Platform Commission (%)", lblPP: "Shipping to Customer ($/R$)", lblMargin: "Profit Margin (%)", resUSAHeader: "USA MARKET", resUSALabel: "TOTAL LANDED COST", resUSATarget: "SUGGESTED RETAIL", resBRHeader: "BRAZIL MARKET", resBRLabel: "CUSTO TOTAL IMPORTADO", resBRTarget: "PREÇO SUGERIDO", btnSave: "SAVE TO HISTORY" },
-    pt: { h1: "PASSO 1: IDENTIFICAÇÃO", h2: "PASSO 2: PESO E DIMENSÕES", h3: "PASSO 3: CUSTOS DE LOGÍSTICA", h4: "PASSO 4: ESTRATÉGIA DE VENDA", lblNotes: "Nome do Produto ou Projeto", lblHS: "Código de Classificação (NCM)", lblUnit: "Preço Fábrica ($)", lblQty: "Quantidade Total", lblDimToggle: "CALCULAR ESPAÇO OCUPADO?", lblWeight: "Peso Unitário (lb)", lblOrigin: "País de Origem", lblFreight: "Frete Internacional ($)", lblMktFee: "Comissão Plataforma (%)", lblPP: "Frete ao Cliente ($/R$)", lblMargin: "Margem de Lucro (%)", resUSAHeader: "MERCADO EUA", resUSALabel: "CUSTO TOTAL IMPORTADO", resUSATarget: "SUGGESTED RETAIL", resBRHeader: "MERCADO BRASIL", resBRLabel: "CUSTO TOTAL IMPORTADO", resBRTarget: "PREÇO SUGERIDO", btnSave: "SALVAR NO HISTÓRICO" }
+    en: { h1: "STEP 1: IDENTITY", h2: "STEP 2: PHYSICAL", h3: "STEP 3: LOGISTICS", h4: "STEP 4: STRATEGY", lblNotes: "Project Name", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblWeight: "Weight (lb)", lblFreight: "Total Freight ($)", lblBuffer: "Handling Buffer ($)", lblDuty: "Duty (%)", lblMkt: "Platform", lblMktFee: "Comm. (%)", lblMargin: "Margin (%)", lblPP: "Final Shipping ($/R$)", resUSAHeader: "USA BREAKDOWN", resUSALabel: "TOTAL LANDED COST", resUSATarget: "TARGET RETAIL", btnSave: "SAVE TO HISTORY" },
+    pt: { h1: "PASSO 1: IDENTIDADE", h2: "PASSO 2: FÍSICO", h3: "PASSO 3: LOGÍSTICA", h4: "PASSO 4: ESTRATÉGIA", lblNotes: "Nome do Projeto", lblUnit: "Custo Fábrica ($)", lblQty: "Quantidade", lblWeight: "Peso (lb)", lblFreight: "Frete Total ($)", lblBuffer: "Margem Manuseio ($)", lblDuty: "Imposto (%)", lblMkt: "Plataforma", lblMktFee: "Comis. (%)", lblMargin: "Margem (%)", lblPP: "Envio Final ($/R$)", resUSAHeader: "DETALHAMENTO EUA", resUSALabel: "CUSTO TOTAL IMPORTADO", resUSATarget: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO" }
 };
 
+function toggleMeli() { document.getElementById('meliRow').style.display = (document.getElementById('mktSelect').value === 'meli') ? 'flex' : 'none'; }
+function clearZero(el) { if(el.value === "0") el.value = ""; }
 function setLang(l) {
     currentLang = l;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
@@ -144,28 +143,49 @@ function calculate() {
     const buy = parseFloat(document.getElementById('unitCost').value) || 0;
     const qty = parseFloat(document.getElementById('qty').value) || 1;
     const freight = parseFloat(document.getElementById('freight').value) || 0;
+    const buffer = parseFloat(document.getElementById('buffer').value) || 0;
+    const dutyRate = (parseFloat(document.getElementById('manualDuty').value) || 0) / 100;
     const margin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
-    const mktRate = (parseFloat(document.getElementById('mktFee').value) || 0) / 100;
     const pp = parseFloat(document.getElementById('pickPack').value) || 0;
-    
-    const cifBatch = (buy * qty) + freight;
-    const landedUSA = (cifBatch * 1.08 + 50) / qty;
+    let mktRate = (parseFloat(document.getElementById('mktFee').value) || 0) / 100;
+    if(document.getElementById('mktSelect').value === 'meli' && document.getElementById('mlPremium').checked) mktRate += 0.05;
+
+    if (buy === 0) {
+        document.getElementById('landedUSA').innerText = '$0.00';
+        document.getElementById('reqUSA').innerText = '$0.00';
+        return;
+    }
+
+    const unitFreight = freight / qty;
+    const unitBuffer = buffer / qty;
+    const unitDuty = (buy + unitFreight) * dutyRate;
+    const landedUSA = buy + unitFreight + unitDuty + unitBuffer;
     const reqUSA = (landedUSA + pp) / (1 - mktRate - margin);
 
     document.getElementById('landedUSA').innerText = '$' + landedUSA.toFixed(2);
     document.getElementById('reqUSA').innerText = '$' + reqUSA.toFixed(2);
-
-    const landedBR = (cifBatch * 5.26 * 1.38) / qty;
-    const reqBR = (landedBR + (pp * 5.26)) / (1 - mktRate - margin);
-    document.getElementById('landedBR').innerText = 'R$' + landedBR.toFixed(2);
-    document.getElementById('reqBR').innerText = 'R$' + reqBR.toFixed(2);
+    document.getElementById('brkFactory').innerText = '$' + buy.toFixed(2);
+    document.getElementById('brkLog').innerText = '$' + (unitFreight + unitBuffer).toFixed(2);
+    document.getElementById('brkDuty').innerText = '$' + unitDuty.toFixed(2);
+    document.getElementById('brkMkt').innerText = '$' + (reqUSA * mktRate).toFixed(2);
 }
 
-function autoCategory() { calculate(); }
+function autoCategory() {
+    const hs = document.getElementById('hsCode').value;
+    document.getElementById('lumberTool').style.display = hs.startsWith('44') ? 'block' : 'none';
+    if(hs === "8301.40") { document.getElementById('manualDuty').value = 3.5; }
+    calculate();
+}
+function convertLumber() {
+    const m3 = parseFloat(document.getElementById('m3Input').value) || 0;
+    document.getElementById('qty').value = Math.round(m3 * 423.77);
+    calculate();
+}
 function saveToHistory() {
-    const div = document.createElement('div');
-    div.innerText = `${new Date().toLocaleTimeString()} - ${document.getElementById('projNotes').value || 'Calc'}: USA ${document.getElementById('reqUSA').innerText}`;
-    document.getElementById('historyList').prepend(div);
+    const list = document.getElementById('historyList');
+    const entry = document.createElement('div');
+    entry.innerText = `${new Date().toLocaleTimeString()} - ${document.getElementById('projNotes').value || 'Calc'}: ${document.getElementById('reqUSA').innerText}`;
+    list.prepend(entry);
 }
 window.onload = () => setLang('en');
 </script>
