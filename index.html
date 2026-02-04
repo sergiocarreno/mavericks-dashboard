@@ -3,171 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mavericks Master V31</title>
+    <title>Mavericks Master V45</title>
     <style>
-        :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; --alert: #ff9800; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; -webkit-font-smoothing: antialiased; }
+        :root { --primary: #1a337e; --secondary: #009c3b; --bg: #f4f7f6; --white: #ffffff; --accent: #ffeb3b; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .container { max-width: 1200px; margin: auto; background: var(--white); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 320px; }
-        .lang-switch { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; }
-        .lang-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-container img { max-width: 100%; height: auto; border-radius: 8px; width: 220px; }
+        .lang-btn { background: #eee; border: none; padding: 12px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .lang-btn.active { background: var(--primary); color: white; }
-        .grid { display: flex; flex-direction: column; gap: 15px; }
-        @media (min-width: 768px) { .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; } }
-        .card { padding: 12px; border: 1px solid #eee; border-radius: 10px; background: #fff; }
-        .header { background: var(--primary); color: white; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 12px; font-size: 0.8rem; text-transform: uppercase; text-align: center; }
-        .input-group { margin-bottom: 8px; }
-        label { display: block; font-weight: bold; margin-bottom: 4px; color: #444; font-size: 0.7rem; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .results-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-        @media (min-width: 768px) { .results-grid { display: grid; grid-template-columns: 1fr 1fr; } }
-        .result-box { padding: 15px; border-radius: 12px; border-top: 6px solid var(--primary); background: #f9f9f9; }
-        .landed-highlight { background: var(--accent); padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 2px solid #fbc02d; }
-        .big-val { font-size: 1.4rem; font-weight: bold; color: #333; margin: 0; }
-        .action-btn { background: var(--secondary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        #lumberConverter { display: none; background: #e8f5e9; border: 1px dashed #2e7d32; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .history-card { margin-top: 20px; background: #fafafa; border: 1px solid #ddd; border-radius: 10px; padding: 10px; }
-        .history-list { font-size: 0.75rem; width: 100%; border-collapse: collapse; }
-        .history-list th, .history-list td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+
+        .grid { display: flex; flex-direction: column; gap: 20px; }
+        @media (min-width: 768px) { .grid { display: grid; grid-template-columns: 1fr 1fr; } }
+        
+        .card { padding: 20px; border: 1px solid #eee; border-radius: 15px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { background: var(--primary); color: white; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; font-size: 0.85rem; text-align: center; }
+        
+        /* UPDATED INPUTS - 60PX HEIGHT */
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; color: #444; font-size: 0.75rem; text-transform: uppercase; }
+        input, select, textarea { 
+            width: 100%; 
+            height: 60px; /* Enhanced height for better touch targets */
+            padding: 0 15px; 
+            border: 2px solid #ddd; 
+            border-radius: 12px; 
+            font-size: 20px; /* Larger text for high visibility */
+            box-sizing: border-box; 
+            background: #fff;
+            -webkit-appearance: none;
+        }
+        textarea { height: auto; padding: 15px; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        .toggle-box { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+        .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(30px); }
+
+        .results-area { display: flex; flex-direction: column; gap: 20px; margin-top: 30px; border-top: 3px solid #eee; padding-top: 25px; }
+        @media (min-width: 768px) { .results-area { display: grid; grid-template-columns: 1fr 1fr; } }
+        .result-card { padding: 25px; border-radius: 20px; background: #fff; border: 2px solid #eee; }
+        .highlight { background: var(--accent); padding: 15px; border-radius: 12px; border: 2px solid #fbc02d; margin: 15px 0; text-align: center; }
+        .val { font-size: 2.2rem; font-weight: 900; color: #111; display: block; }
+        
+        .action-btn { background: var(--secondary); color: white; border: none; padding: 20px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
+        .history-card { margin-top: 20px; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="lang-switch">
-        <button onclick="setLang('en')" id="btnEN" class="lang-btn active">EN</button>
-        <button onclick="setLang('pt')" id="btnPT" class="lang-btn">PT</button>
-    </div>
-
-    <div class="logo-container"><img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo"></div>
-
-    <div id="tariffAlert" style="background:#fff3e0; border-left:5px solid #ff9800; padding:10px; font-size:0.75rem; color:#e65100; margin-bottom:12px; display:none;"></div>
-
-    <div class="card" style="margin-bottom: 15px;">
-        <label id="lblNotes">PROJECT / PRODUCT NOTES</label>
-        <textarea id="projNotes" rows="1" placeholder="Enter Description"></textarea>
+    <div class="app-header">
+        <div class="logo-container"><img src="https://i.postimg.cc/PxB0KX2t/mavericks.jpg" alt="Mavericks Logo"></div>
+        <div class="lang-switch">
+            <button onclick="setLang('en')" id="btnEN" class="lang-btn active">English</button>
+            <button onclick="setLang('pt')" id="btnPT" class="lang-btn">Português</button>
+        </div>
     </div>
 
     <div class="grid">
         <div class="card">
-            <div class="header" id="h1">1. IMPORT SPECS</div>
-            <div class="input-group"><label id="lblHS">HS / NCM CODE</label><input type="text" id="hsCode" placeholder="Code Search" oninput="autoCategory()" onclick="clearZero(this)"></div>
+            <div class="header" id="h1">STEP 1: PRODUCT IDENTITY</div>
+            <div class="input-group"><label id="lblNotes">Product or Project Name</label><input type="text" id="projNotes" placeholder="..."></div>
+            <div class="input-group"><label id="lblHS">Classification Code (NCM)</label><input type="text" id="hsCode" oninput="autoCategory()" placeholder="..."></div>
+            <div class="input-group"><label id="lblUnit">Factory Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div class="input-group"><label id="lblQty">Total Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+        </div>
+
+        <div class="card">
+            <div class="header" id="h2">STEP 2: WEIGHT & DIMENSIONS</div>
+            <div class="toggle-box">
+                <span id="lblDimToggle" style="font-weight:bold;">CALCULATE VOLUME SPACE?</span>
+                <label class="switch"><input type="checkbox" id="useDim" onchange="calculate()"><span class="slider"></span></label>
+            </div>
+            <div class="input-group"><label id="lblWeight">Weight (lb)</label><input type="number" id="uWeight" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                <input type="number" id="uL" value="0" oninput="calculate()" placeholder="L">
+                <input type="number" id="uW" value="0" oninput="calculate()" placeholder="W">
+                <input type="number" id="uH" value="0" oninput="calculate()" placeholder="H">
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="header" id="h3">STEP 3: LOGISTICS COSTS</div>
+            <div class="input-group"><label id="lblOrigin">Origin Country</label><select id="origin" onchange="calculate()"><option value="China">China</option><option value="Brazil">Brazil</option></select></div>
+            <div class="input-group"><label id="lblFreight">Intl Freight ($)</label><input type="number" id="freight" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div style="font-size:0.7rem; background:#f0f0f0; padding:15px; border-radius:12px; margin-top:10px;">
+                BRAZIL IMPOSTOS: IPI    <input type="number" id="brIPI" value="5" oninput="calculate()" style="width:70px; height:30px; font-size:14px;">%    |  ICMS <input type="number" id="brICMS" value="18" oninput="calculate()" style="width:70px; height:30px; font-size:14px;">%
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="header" id="h4">STEP 4: SALES STRATEGY</div>
             <div class="input-group">
-                <label id="lblOrigin">Origin</label>
-                <select id="origin" onchange="calculate()">
-                    <option value="Brazil">Brazil</option>
-                    <option value="China">China</option>
-                    <option value="Other">Other</option>
-                </select>
+                <select id="mktSelect" onchange="calculate()"><option value="amazon">Amazon (USA)</option><option value="meli">Mercado Livre (BR)</option></select>
             </div>
-            <div class="input-group"><label id="lblUnit">Unit Cost ($)</label><input type="number" id="unitCost" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblQty">Quantity</label><input type="number" id="qty" value="1" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblManualDuty">Duty Override (%)</label><input type="number" id="manualDuty" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-        </div>
-
-        <div class="card">
-            <div class="header" id="h2">2. LOGISTICS</div>
-            <div class="input-group"><label id="lblFreight">Total Freight ($)</label><input type="number" id="freight" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblIns">Insurance (%)</label><input type="number" id="insRate" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblInt">Local Drayage ($)</label><input type="number" id="internalFreight" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblOther">Broker/Fees ($)</label><input type="number" id="otherFees" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div style="font-size:0.6rem; color:#666; padding-top:5px; border-top:1px solid #eee;">
-                BR TAXES: IPI % <input type="number" id="brIPI" value="5" oninput="calculate()" onclick="clearZero(this)" style="width:40px;"> 
-                ICMS % <input type="number" id="brICMS" value="18" oninput="calculate()" onclick="clearZero(this)" style="width:40px;">
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="header" id="h3">3. STRATEGY</div>
-            <div class="input-group"><label id="lblMargin">Desired Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblEx">Exchange Rate (USD/BRL)</label>
-                <div style="display:flex; gap:3px;"><input type="number" id="exRate" value="5.26" step="0.01" oninput="calculate()" onclick="clearZero(this)"><button onclick="getLiveExchangeRate()">🔄</button></div>
-            </div>
-            <div class="input-group"><label id="lblMktUSA">Market USA ($)</label><input type="number" id="priceUSA" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div class="input-group"><label id="lblMktBR">Market BR (R$)</label><input type="number" id="priceBR" value="0" oninput="calculate()" onclick="clearZero(this)"></div>
-            <div style="font-size:0.6rem; margin-top:5px;">
-                <input type="checkbox" id="brSurcharge" onchange="calculate()" checked style="width:auto;"> <span id="lblSurcharge">Apply Brazil 40% Tax</span>
-            </div>
-
-            <div id="lumberConverter">
-                <label style="color:#2e7d32; font-size:0.6rem;">LUMBER CONVERTER</label>
-                <div style="display:flex; gap:5px;">
-                    <select id="convType" onchange="convertWood()" style="font-size:10px;"><option value="m3">m³</option><option value="bf">BF</option></select>
-                    <input type="number" id="volInput" value="0" oninput="convertWood()" onclick="clearZero(this)" style="font-size:10px;">
-                </div>
-                <div id="resBF" style="font-weight:bold; color:#2e7d32; font-size:0.7rem;">BF: 0.00</div>
-                <button class="action-btn" onclick="applyConversion()" style="padding:4px; font-size:9px; margin-top:5px;">APPLY TO QTY</button>
-            </div>
+            <div class="input-group"><label id="lblMktFee">Platform Commission (%)</label><input type="number" id="mktFee" value="15" oninput="calculate()"></div>
+            <div class="input-group"><label id="lblPP">Shipping to Customer ($/R$)</label><input type="number" id="pickPack" value="0" oninput="calculate()" onfocus="if(this.value=='0')this.value=''"></div>
+            <div class="input-group"><label id="lblMargin">Profit Margin (%)</label><input type="number" id="targetMargin" value="20" oninput="calculate()"></div>
         </div>
     </div>
 
-    <div class="results-grid">
-        <div class="result-box" style="border-top-color:#3b5998;">
-            <strong id="resUSA">USA (IMPORT)</strong>
-            <div class="landed-highlight"><div id="txtLandedUSA" style="font-size:0.7rem; font-weight:bold;">LANDED COST (Unit)</div><div class="big-val" id="landedUSA">$0.00</div></div>
-            <div id="lblTargetUSA" style="font-size:0.7rem; font-weight:bold; color:#1565c0;">TARGET PRICE</div><div class="big-val" id="reqUSA" style="color:#1565c0; font-size:1.2rem;">$0.00</div>
+    <div class="results-area">
+        <div class="result-card" style="border-top: 8px solid var(--primary);">
+            <strong id="resUSAHeader" style="color:var(--primary);">USA MARKET</strong>
+            <div class="highlight"><label id="resUSALabel">TOTAL LANDED COST</label><span class="val" id="landedUSA">$0.00</span></div>
+            <div id="resUSATarget" style="font-weight:bold; color:var(--primary)">SUGGESTED RETAIL</div><span class="val" id="reqUSA" style="color:var(--primary)">$0.00</span>
         </div>
-        <div class="result-box" id="brResultCard" style="border-top-color:#009c3b;">
-            <strong id="resBR">BRAZIL (IMPORT)</strong>
-            <div class="landed-highlight"><div id="txtLandedBR" style="font-size:0.7rem; font-weight:bold;">CUSTO REAL (Unid)</div><div class="big-val" id="landedBR">R$0.00</div></div>
-            <div id="lblTargetBR" style="font-size:0.7rem; font-weight:bold; color:#1b5e20;">PREÇO ALVO</div><div class="big-val" id="reqBR" style="color:#1b5e20; font-size:1.2rem;">R$0.00</div>
+        <div class="result-card" style="border-top: 8px solid var(--secondary);">
+            <strong id="resBRHeader" style="color:var(--secondary);">BRAZIL MARKET</strong>
+            <div class="highlight"><label id="resBRLabel">CUSTO TOTAL IMPORTADO</label><span class="val" id="landedBR">R$0.00</span></div>
+            <div id="resBRTarget" style="font-weight:bold; color:var(--secondary)">PREÇO SUGERIDO</div><span class="val" id="reqBR" style="color:var(--secondary)">R$0.00</span>
         </div>
     </div>
-
+    
     <button class="action-btn" onclick="saveToHistory()" id="btnSave">SAVE TO HISTORY</button>
-
-    <div class="history-card">
-        <div class="header" style="background:#444" id="hHistory">CALCULATION HISTORY</div>
-        <table class="history-list"><thead><tr><th id="thNotes">Project</th><th id="thLanded">Landed</th><th id="thTarget">Target</th><th>X</th></tr></thead><tbody id="historyBody"></tbody></table>
-    </div>
+    <div id="historyList" class="history-card"></div>
 </div>
 
 <script>
-// UPDATED MASTER LIBRARY 2026
-const hsLibrary = {
-    "4407.11": { name: "Structural Lumber", duty: 10, surcharge: false },
-    "4412.39": { name: "Plywood Sheets", duty: 8, surcharge: true },
-    "8301.40": { name: "Smart Digital Locks", duty: 3.5, surcharge: true },
-    "0201.10.00": { name: "Bovino Carcaça Fresca", duty: 12, surcharge: true },
-    "0301.11.10": { name: "Peixe Aruanã Vivo", duty: 10, surcharge: true },
-    "0901.21.00": { name: "Café Torrado", duty: 15, surcharge: true },
-    "2520.20.90": { name: "Gesso Construção", duty: 5, surcharge: true },
-    "8518.30.00": { name: "Wireless Audio/Earbuds", duty: 0, surcharge: true },
-    "9403.40.00": { name: "Kitchen Cabinets (Wood)", duty: 25, surcharge: false }
-};
-
 let currentLang = 'en';
 const trans = {
-    en: { h1: "1. IMPORT SPECS", h2: "2. LOGISTICS", h3: "3. STRATEGY", hHistory: "HISTORY", thNotes: "Project", thLanded: "Landed", thTarget: "Target", lblNotes: "PROJECT / PRODUCT NOTES", lblHS: "HS / NCM CODE", lblOrigin: "Origin", lblUnit: "Unit Cost ($)", lblQty: "Quantity", lblManualDuty: "Duty Override (%)", lblFreight: "Total Freight ($)", lblIns: "Insurance (%)", lblInt: "Local Drayage ($)", lblOther: "Broker/Fees ($)", lblEx: "Exchange Rate (USD/BRL)", lblSurcharge: "Apply Brazil 40% Tax", lblMktUSA: "Market USA ($)", lblMktBR: "Market BR (R$)", lblMargin: "Margin (%)", resUSA: "USA (IMPORT)", resBR: "BRAZIL (IMPORT)", txtLandedUSA: "LANDED COST (Unit)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "TARGET PRICE", lblTargetBR: "PREÇO ALVO", btnSave: "SAVE TO HISTORY", alertS232: "Lumber Alert: 10% S232 Active. Brazil 40% Tax EXEMPT." },
-    pt: { h1: "1. ESPECIFICAÇÕES", h2: "2. LOGÍSTICA", h3: "3. ESTRATÉGIA", hHistory: "HISTÓRICO", thNotes: "Projeto", thLanded: "Custo Real", thTarget: "Alvo", lblNotes: "NOTAS DO PROJETO / PRODUTO", lblHS: "CÓDIGO HS / NCM", lblOrigin: "Origem", lblUnit: "Custo Unitário ($)", lblQty: "Quantidade", lblManualDuty: "Imposto Manual (%)", lblFreight: "Frete Total ($)", lblIns: "Seguro (%)", lblInt: "Frete Interno ($)", lblOther: "Taxas de Despacho ($)", lblEx: "Câmbio (USD/BRL)", lblSurcharge: "Aplicar 40% do Brasil", lblMktUSA: "Preço Mercado EUA ($)", lblMktBR: "Preço Mercado BR (R$)", lblMargin: "Margem (%)", resUSA: "EUA (IMPORTAÇÃO)", resBR: "BRASIL (IMPORTAÇÃO)", txtLandedUSA: "CUSTO REAL (Unid)", txtLandedBR: "CUSTO REAL (Unid)", lblTargetUSA: "PREÇO ALVO", lblTargetBR: "PREÇO ALVO", btnSave: "SALVAR NO HISTÓRICO", alertS232: "Madeira: 10% S232 Ativa. Isento de sobretaxa de 40%." }
+    en: { h1: "STEP 1: PRODUCT IDENTITY", h2: "STEP 2: WEIGHT & DIMENSIONS", h3: "STEP 3: LOGISTICS COSTS", h4: "STEP 4: SALES STRATEGY", lblNotes: "Product or Project Name", lblHS: "Classification Code (NCM)", lblUnit: "Factory Unit Cost ($)", lblQty: "Total Quantity", lblDimToggle: "CALCULATE VOLUME SPACE?", lblWeight: "Unit Weight (lb)", lblOrigin: "Origin Country", lblFreight: "Intl Freight ($)", lblMktFee: "Platform Commission (%)", lblPP: "Shipping to Customer ($/R$)", lblMargin: "Profit Margin (%)", resUSAHeader: "USA MARKET", resUSALabel: "TOTAL LANDED COST", resUSATarget: "SUGGESTED RETAIL", resBRHeader: "BRAZIL MARKET", resBRLabel: "CUSTO TOTAL IMPORTADO", resBRTarget: "PREÇO SUGERIDO", btnSave: "SAVE TO HISTORY" },
+    pt: { h1: "PASSO 1: IDENTIFICAÇÃO", h2: "PASSO 2: PESO E DIMENSÕES", h3: "PASSO 3: CUSTOS DE LOGÍSTICA", h4: "PASSO 4: ESTRATÉGIA DE VENDA", lblNotes: "Nome do Produto ou Projeto", lblHS: "Código de Classificação (NCM)", lblUnit: "Preço Fábrica ($)", lblQty: "Quantidade Total", lblDimToggle: "CALCULAR ESPAÇO OCUPADO?", lblWeight: "Peso Unitário (lb)", lblOrigin: "País de Origem", lblFreight: "Frete Internacional ($)", lblMktFee: "Comissão Plataforma (%)", lblPP: "Frete ao Cliente ($/R$)", lblMargin: "Margem de Lucro (%)", resUSAHeader: "MERCADO EUA", resUSALabel: "CUSTO TOTAL IMPORTADO", resUSATarget: "SUGGESTED RETAIL", resBRHeader: "MERCADO BRASIL", resBRLabel: "CUSTO TOTAL IMPORTADO", resBRTarget: "PREÇO SUGERIDO", btnSave: "SALVAR NO HISTÓRICO" }
 };
 
-function clearZero(el) { if(el.value === "0") el.value = ""; }
-
-function autoCategory() {
-    const hs = document.getElementById('hsCode').value.trim();
-    const conv = document.getElementById('lumberConverter');
-    const notes = document.getElementById('projNotes');
-    const dutyInput = document.getElementById('manualDuty');
-    const surcharge = document.getElementById('brSurcharge');
-
-    if (hs === "") {
-        notes.value = ""; dutyInput.value = "0"; surcharge.checked = true; conv.style.display = "none";
-        document.getElementById('tariffAlert').style.display = "none"; calculate(); return;
-    }
-
-    conv.style.display = hs.startsWith("44") ? "block" : "none";
-
-    if(hsLibrary[hs]) {
-        notes.value = hsLibrary[hs].name;
-        dutyInput.value = hsLibrary[hs].duty;
-        surcharge.checked = hsLibrary[hs].surcharge;
-        if(!hsLibrary[hs].surcharge && document.getElementById('origin').value === 'Brazil') {
-            document.getElementById('tariffAlert').innerText = trans[currentLang].alertS232;
-            document.getElementById('tariffAlert').style.display = "block";
-        }
-    } else { document.getElementById('tariffAlert').style.display = "none"; }
+function setLang(l) {
+    currentLang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
+    for(let key in trans[l]) { let el = document.getElementById(key); if(el) el.innerText = trans[l][key]; }
     calculate();
 }
 
@@ -175,82 +144,30 @@ function calculate() {
     const buy = parseFloat(document.getElementById('unitCost').value) || 0;
     const qty = parseFloat(document.getElementById('qty').value) || 1;
     const freight = parseFloat(document.getElementById('freight').value) || 0;
-    const insurance = (buy * qty * (parseFloat(document.getElementById('insRate').value) || 0)) / 100;
-    const internal = parseFloat(document.getElementById('internalFreight').value) || 0;
-    const other = parseFloat(document.getElementById('otherFees').value) || 0;
     const margin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
-    const exRate = parseFloat(document.getElementById('exRate').value) || 5.26;
-    const manualDuty = (parseFloat(document.getElementById('manualDuty').value) || 0) / 100;
-    const origin = document.getElementById('origin').value;
+    const mktRate = (parseFloat(document.getElementById('mktFee').value) || 0) / 100;
+    const pp = parseFloat(document.getElementById('pickPack').value) || 0;
+    
+    const cifBatch = (buy * qty) + freight;
+    const landedUSA = (cifBatch * 1.08 + 50) / qty;
+    const reqUSA = (landedUSA + pp) / (1 - mktRate - margin);
 
-    if(origin === 'Brazil') document.getElementById('brResultCard').style.display = 'none';
-    else document.getElementById('brResultCard').style.display = 'block';
-
-    let usDuty = manualDuty || 0.035;
-    if(origin === 'China') usDuty += 0.25;
-    if(origin === 'Brazil' && document.getElementById('brSurcharge').checked) usDuty += 0.40;
-
-    const cifBatch = (buy * qty) + freight + insurance + internal + other;
-    const landedUSA = (cifBatch + (cifBatch * usDuty) + 50) / qty;
     document.getElementById('landedUSA').innerText = '$' + landedUSA.toFixed(2);
-    document.getElementById('reqUSA').innerText = '$' + (landedUSA / 0.77).toFixed(2);
+    document.getElementById('reqUSA').innerText = '$' + reqUSA.toFixed(2);
 
-    // CASCADE BR TAX LOGIC
-    const cifBRL = cifBatch * exRate;
-    const ii = cifBRL * 0.12;
-    const ipi = (cifBRL + ii) * (parseFloat(document.getElementById('brIPI').value)/100);
-    const icmsRate = (parseFloat(document.getElementById('brICMS').value)/100);
-    const totalBR = (cifBRL + ii + ipi + (cifBRL * 0.1175)) / (1 - icmsRate);
-
-    document.getElementById('landedBR').innerText = 'R$' + (totalBR / qty).toFixed(2);
-    document.getElementById('reqBR').innerText = 'R$' + (totalBR / (qty * 0.74)).toFixed(2);
+    const landedBR = (cifBatch * 5.26 * 1.38) / qty;
+    const reqBR = (landedBR + (pp * 5.26)) / (1 - mktRate - margin);
+    document.getElementById('landedBR').innerText = 'R$' + landedBR.toFixed(2);
+    document.getElementById('reqBR').innerText = 'R$' + reqBR.toFixed(2);
 }
 
+function autoCategory() { calculate(); }
 function saveToHistory() {
-    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
-    const entry = { notes: document.getElementById('projNotes').value || "Unnamed", landed: document.getElementById('landedUSA').innerText, target: document.getElementById('reqUSA').innerText };
-    history.unshift(entry);
-    localStorage.setItem('mavericksHistory', JSON.stringify(history.slice(0, 10)));
-    renderHistory();
+    const div = document.createElement('div');
+    div.innerText = `${new Date().toLocaleTimeString()} - ${document.getElementById('projNotes').value || 'Calc'}: USA ${document.getElementById('reqUSA').innerText}`;
+    document.getElementById('historyList').prepend(div);
 }
-
-function renderHistory() {
-    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
-    document.getElementById('historyBody').innerHTML = history.map((e, i) => `<tr><td>${e.notes}</td><td style="font-weight:bold">${e.landed}</td><td style="color:#1565c0">${e.target}</td><td><button onclick="deleteHistory(${i})" style="color:red; border:none; background:none; cursor:pointer">X</button></td></tr>`).join('');
-}
-
-function deleteHistory(i) {
-    const history = JSON.parse(localStorage.getItem('mavericksHistory') || '[]');
-    history.splice(i, 1);
-    localStorage.setItem('mavericksHistory', JSON.stringify(history));
-    renderHistory();
-}
-
-function convertWood() {
-    const val = parseFloat(document.getElementById('volInput').value) || 0;
-    const type = document.getElementById('convType').value;
-    document.getElementById('resBF').innerText = "BF: " + ((type === 'm3') ? val * 423.77 : val).toFixed(2);
-}
-
-function applyConversion() {
-    const val = parseFloat(document.getElementById('volInput').value) || 0;
-    const type = document.getElementById('convType').value;
-    document.getElementById('qty').value = Math.round((type === 'm3') ? val * 423.77 : val);
-    calculate();
-}
-
-function setLang(l) {
-    currentLang = l;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.id === 'btn' + l.toUpperCase()));
-    const t = trans[l];
-    for (let id in t) { let el = document.getElementById(id); if (el) el.innerText = t[id]; }
-    renderHistory(); calculate();
-}
-
-async function getLiveExchangeRate() {
-    try { const r = await fetch('https://open.er-api.com/v6/latest/USD'); const d = await r.json(); document.getElementById('exRate').value = d.rates.BRL.toFixed(2); calculate(); } catch (e) {}
-}
-window.onload = () => { getLiveExchangeRate(); setLang('en'); };
+window.onload = () => setLang('en');
 </script>
 </body>
 </html>
