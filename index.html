@@ -938,7 +938,7 @@ body {
     <div class="hdr-icon">🚀</div>
     <div>
       <div class="hdr-name">Mavericks Import Hunter</div>
-      <div class="hdr-sub">True Landed Cost • China → BR / USA • v91</div>
+      <div class="hdr-sub">True Landed Cost • China → BR / USA • v99</div>
     </div>
   </div>
   <div class="hdr-right">
@@ -1262,12 +1262,12 @@ body {
   <div class="login-box">
     <div class="login-logo">🚀</div>
     <div class="login-title">Mavericks Import <span>Hunter</span></div>
-    <div class="login-sub">Ferramenta de análise de importação para sua equipe. Dados compartilhados em tempo real via Google Sheets.</div>
+    <div class="login-sub">Faça login com sua conta Google para acessar a ferramenta da equipe Mavericks. Seus produtos ficam salvos automaticamente na planilha compartilhada.</div>
     <div class="login-features">
-      <div class="lf-item"><div class="lf-dot g"></div><span>Produtos salvos automaticamente no Google Sheets da equipe</span></div>
-      <div class="lf-item"><div class="lf-dot b"></div><span>Veja quem adicionou cada produto e de qual feira</span></div>
-      <div class="lf-item"><div class="lf-dot y"></div><span>Dados acessíveis em qualquer dispositivo, sempre</span></div>
-      <div class="lf-item"><div class="lf-dot p"></div><span>Relatório WhatsApp com nome do usuário incluso</span></div>
+      <div class="lf-item"><div class="lf-dot g"></div><span>Login em 1 clique — sem senha, sem cadastro</span></div>
+      <div class="lf-item"><div class="lf-dot b"></div><span>Produtos salvos no Google Sheets da equipe automaticamente</span></div>
+      <div class="lf-item"><div class="lf-dot y"></div><span>Registra seu nome em cada produto que você adicionar</span></div>
+      <div class="lf-item"><div class="lf-dot p"></div><span>Funciona no iPhone, Android, computador</span></div>
     </div>
     <button class="btn-google" onclick="startGoogleLogin()">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -1347,46 +1347,47 @@ body {
 </div>
 
 <!-- ════════════ SHEET CONFIG MODAL ════════════ -->
+<!-- ════════════ SHEET INFO MODAL (admin reference only) ════════════ -->
 <div class="save-modal-overlay" id="sheetConfigOverlay" onclick="onSheetConfigOverlayClick(event)">
   <div class="save-modal-box">
     <div class="save-modal-hdr">
       <div>
-        <div class="save-modal-title">📊 Configurar Google Sheet</div>
-        <div class="save-modal-sub">Cole o ID da sua planilha para sincronizar</div>
+        <div class="save-modal-title">📊 Google Sheets</div>
+        <div class="save-modal-sub">Informações de sincronização</div>
       </div>
       <button class="modal-close-x" onclick="closeSheetConfig()">×</button>
     </div>
     <div class="save-modal-body">
-      <div style="font-size:0.82rem;color:var(--muted);line-height:1.65;background:var(--s2);padding:13px;border-radius:var(--r3);">
-        <strong style="color:var(--text)">Como configurar (5 minutos):</strong><br>
-        1. Acesse <a href="https://sheets.google.com" target="_blank" style="color:var(--blue)">sheets.google.com</a> e crie uma planilha nova<br>
-        2. Nomeie como <strong style="color:var(--gold)">"Mavericks Import Hunter"</strong><br>
-        3. Copie o ID da URL: sheets.google.com/d/<strong style="color:var(--green)">ID_AQUI</strong>/edit<br>
-        4. Cole abaixo e clique em Salvar<br>
-        5. Compartilhe a planilha com sua equipe (Editar)
-      </div>
-      <div>
-        <label class="modal-label">ID da Planilha Google Sheets</label>
-        <input class="sb-input" type="text" id="sheetIdInput"
-          placeholder="Ex: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
-          style="width:100%;margin-top:0">
-      </div>
-      <div>
-        <label class="modal-label">Google Client ID (OAuth)</label>
-        <input class="sb-input" type="text" id="clientIdInput"
-          placeholder="Ex: 123456789-abcdef.apps.googleusercontent.com"
-          style="width:100%;margin-top:0">
-        <div style="font-size:0.69rem;color:var(--muted);margin-top:5px">
-          Crie em <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → APIs → Credenciais → OAuth 2.0 Client ID (Web application)
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label class="modal-label">Planilha conectada</label>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r3);padding:10px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span style="font-size:.82rem;color:var(--green);font-weight:700;">✓ Mavericks Import Hunter</span>
+            <a href="https://docs.google.com/spreadsheets/d/1-5T0nmavcCSDWYPC_uHwESKoGGaHSbZg_HJuO2eVpH8/edit"
+               target="_blank"
+               style="font-size:.75rem;color:var(--blue);text-decoration:none;white-space:nowrap;font-weight:700;">
+              Abrir ↗
+            </a>
+          </div>
+        </div>
+        <div>
+          <label class="modal-label">Sheet ID</label>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r3);padding:10px 13px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--muted);">1-5T0nmavcCSDWYPC_uHwESKoGGaHSbZg_HJuO2eVpH8</span>
+          </div>
+        </div>
+        <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.18);border-radius:var(--r3);padding:12px 14px;font-size:.82rem;color:var(--body);line-height:1.65;">
+          Todos os produtos salvos vão direto para esta planilha. Cada entrada inclui nome do usuário, email e data. Nenhuma configuração adicional necessária.
         </div>
       </div>
     </div>
     <div class="save-modal-footer">
-      <button class="btn-sb primary" onclick="saveSheetConfig()" style="flex:1;padding:11px">Salvar Configuração</button>
-      <button class="btn-sb ghost" onclick="closeSheetConfig()" style="padding:11px 16px">Cancelar</button>
+      <button class="btn-sb primary" onclick="syncFromSheet();closeSheetConfig();" style="flex:1;padding:11px">🔄 Sincronizar agora</button>
+      <button class="btn-sb ghost" onclick="closeSheetConfig()" style="padding:11px 16px">Fechar</button>
     </div>
   </div>
 </div>
+
 
 
 <!-- ════════════ WHATSAPP MODAL ════════════ -->
@@ -3228,9 +3229,9 @@ function copyWAMessage() {
 // v98: GOOGLE AUTH + SHEETS SYNC SYSTEM
 // ═══════════════════════════════════════════════════════════════════
 
-// ── Config (loaded from localStorage, set via Sheet Config modal) ──
-let GSHEET_ID    = localStorage.getItem('mavSheetId')    || '';
-let GCLIENT_ID   = localStorage.getItem('mavClientId')   || '';
+// ── Config — fully hardcoded, no setup needed by users ──
+const GSHEET_ID  = '1-5T0nmavcCSDWYPC_uHwESKoGGaHSbZg_HJuO2eVpH8';
+const GCLIENT_ID = '233224120696-et8jjkj6bsetsk884krodnk6qv3r4ut5.apps.googleusercontent.com';
 const GSCOPE     = 'https://www.googleapis.com/auth/spreadsheets';
 const SHEET_NAME = 'Produtos';  // Tab name inside the spreadsheet
 const SHEET_COLS = ['ID','Nome','NCM','PriceUSD','PriceRMB','Qty','Destino','Trip','Notas',
@@ -3268,12 +3269,6 @@ window.onGapiLoaded = onGapiLoaded;
 
 // ── Start login ──
 function startGoogleLogin() {
-  if (!GCLIENT_ID) {
-    // No client ID yet — show config first
-    document.getElementById('loginScreen').style.display = 'none';
-    openSheetConfig(true);
-    return;
-  }
   initTokenClient();
   gTokenClient.requestAccessToken({ prompt: 'consent' });
 }
@@ -3328,13 +3323,8 @@ function completeLogin() {
   // Set up token auto-refresh (Google tokens expire in 1h)
   gTokenReady = true;
 
-  // Show sheet config if not configured
-  if (!GSHEET_ID) {
-    setTimeout(() => openSheetConfig(false), 400);
-  } else {
-    // Sync products from sheet
-    syncFromSheet();
-  }
+  // Always sync — both IDs are hardcoded
+  syncFromSheet();
 
   showToast('👋 Bem-vindo, ' + currentUser.name.split(' ')[0] + '!');
 }
@@ -3392,7 +3382,7 @@ function signOut() {
 // ── Restore session from localStorage (silent re-login check) ──
 function tryRestoreSession() {
   const saved = localStorage.getItem('mavUser');
-  if (!saved || !GCLIENT_ID) {
+  if (!saved) {
     document.getElementById('loginScreen').style.display = 'flex';
     return;
   }
@@ -3411,41 +3401,16 @@ function tryRestoreSession() {
   }
 }
 
-// ── Sheet Config ──
-let sheetConfigFromLogin = false;
-function openSheetConfig(fromLogin = false) {
-  sheetConfigFromLogin = fromLogin;
-  document.getElementById('sheetIdInput').value   = GSHEET_ID   || '';
-  document.getElementById('clientIdInput').value  = GCLIENT_ID  || '';
+// ── Sheet Info Modal ──
+function openSheetConfig() {
   document.getElementById('sheetConfigOverlay').classList.add('open');
   document.getElementById('userMenu')?.classList.remove('open');
 }
 function closeSheetConfig() {
   document.getElementById('sheetConfigOverlay').classList.remove('open');
-  if (sheetConfigFromLogin && !GSHEET_ID) {
-    document.getElementById('loginScreen').style.display = 'flex';
-  }
 }
 function onSheetConfigOverlayClick(e) {
   if (e.target === document.getElementById('sheetConfigOverlay')) closeSheetConfig();
-}
-function saveSheetConfig() {
-  const sid = document.getElementById('sheetIdInput').value.trim();
-  const cid = document.getElementById('clientIdInput').value.trim();
-  if (!sid) { showToast('⚠️ Cole o ID da planilha.'); return; }
-  if (!cid) { showToast('⚠️ Cole o Google Client ID.'); return; }
-  GSHEET_ID  = sid;
-  GCLIENT_ID = cid;
-  localStorage.setItem('mavSheetId',  sid);
-  localStorage.setItem('mavClientId', cid);
-  closeSheetConfig();
-  if (!currentUser) {
-    document.getElementById('loginScreen').style.display = 'flex';
-    showToast('✅ Configurado! Agora faça login.');
-  } else {
-    syncFromSheet();
-    showToast('✅ Sheet configurado! Sincronizando…');
-  }
 }
 
 // ── Sync status UI ──
