@@ -3232,7 +3232,7 @@ function copyWAMessage() {
 // ── Config — fully hardcoded, no setup needed by users ──
 const GSHEET_ID  = '1-5T0nmavcCSDWYPC_uHwESKoGGaHSbZg_HJuO2eVpH8';
 const GCLIENT_ID = '233224120696-et8jjkj6bsetsk884krodnk6qv3r4ut5.apps.googleusercontent.com';
-const GSCOPE     = 'https://www.googleapis.com/auth/spreadsheets';
+const GSCOPE = 'https://www.googleapis.com/auth/spreadsheets openid profile email';
 const SHEET_NAME = 'Produtos';
 const SHEET_COLS = ['ID','Nome','NCM','PriceUSD','PriceRMB','Qty','Destino','Trip','Notas',
                     'UserName','UserEmail','SavedAt','BRUnitCost','BRMargin','BRMonthly',
@@ -3312,7 +3312,7 @@ function initTokenClient() {
   if (gTokenClient) return;
   gTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GCLIENT_ID,
-    scope: GSCOPE + ' https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+    scope: GSCOPE,
     callback: onTokenReceived,
   });
 }
@@ -3346,12 +3346,29 @@ async function onTokenReceived(tokenResponse) {
     return;
   }
 
-  // First login — fetch user profile
+  // First login — decode user info from id_token JWT (no extra network call needed)
   try {
-    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: 'Bearer ' + accessToken }
-    });
-    const info = await res.json();
+    // id_token is a JWT — decode the payload (middle segment, base64url encoded)
+    const idToken = tokenResponse.id_token;
+    let info = null;
+
+    if (idToken) {
+      // Decode JWT payload without verifying signature (Google already verified it)
+      const payload = idToken.split('.')[1];
+      const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+      info = {
+        name:    decoded.name    || decoded.email?.split('@')[0] || 'Usuário',
+        email:   decoded.email   || '',
+        picture: decoded.picture || ''
+      };
+    } else {
+      // Fallback: fetch userinfo if no id_token (shouldn't happen but just in case)
+      const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + accessToken }
+      });
+      info = await res.json();
+    }
+
     currentUser = {
       name: info.name,
       email: info.email,
@@ -3360,14 +3377,23 @@ async function onTokenReceived(tokenResponse) {
       tokenExpiry
     };
     saveSession(currentUser);
-    // Keep mavUser for backwards compat
     localStorage.setItem('mavUser', JSON.stringify({ name: info.name, email: info.email, picture: info.picture }));
 
     if (gApiReady) gapi.client.setToken({ access_token: accessToken });
     completeLogin();
   } catch(e) {
-    showToast('❌ Erro ao obter perfil Google.');
-    document.getElementById('loginScreen').style.display = 'flex';
+    console.error('Profile decode error:', e);
+    // Last resort: create a minimal user from whatever we have
+    currentUser = {
+      name: 'Usuário',
+      email: '',
+      picture: '',
+      accessToken,
+      tokenExpiry
+    };
+    saveSession(currentUser);
+    if (gApiReady) gapi.client.setToken({ access_token: accessToken });
+    completeLogin();
   }
 }
 
