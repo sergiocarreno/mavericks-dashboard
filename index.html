@@ -1258,7 +1258,7 @@ body {
 </div>
 
 <!-- ════════════ LOGIN SCREEN ════════════ -->
-<div id="loginScreen">
+<div id="loginScreen" style="display:none">
   <div class="login-box">
     <div class="login-logo">🚀</div>
     <div class="login-title">Mavericks Import <span>Hunter</span></div>
@@ -3233,17 +3233,48 @@ function copyWAMessage() {
 const GSHEET_ID  = '1-5T0nmavcCSDWYPC_uHwESKoGGaHSbZg_HJuO2eVpH8';
 const GCLIENT_ID = '233224120696-et8jjkj6bsetsk884krodnk6qv3r4ut5.apps.googleusercontent.com';
 const GSCOPE     = 'https://www.googleapis.com/auth/spreadsheets';
-const SHEET_NAME = 'Produtos';  // Tab name inside the spreadsheet
+const SHEET_NAME = 'Produtos';
 const SHEET_COLS = ['ID','Nome','NCM','PriceUSD','PriceRMB','Qty','Destino','Trip','Notas',
                     'UserName','UserEmail','SavedAt','BRUnitCost','BRMargin','BRMonthly',
                     'BRSuggest','MLPrice','USUnitCost','USMargin','USMonthly','USSuggest','AMZPrice'];
 
-// ── State ──
-let currentUser   = null;   // { name, email, picture, accessToken }
+// ── Auth State ──
+let currentUser   = null;   // { name, email, picture, accessToken, tokenExpiry }
 let gTokenClient  = null;
 let gApiReady     = false;
 let gTokenReady   = false;
-let pendingSave   = null;   // product entry waiting for token
+let pendingSave   = null;
+let tokenRefreshTimer = null;
+
+// ── Persist & restore full session including token ──
+function saveSession(user) {
+  localStorage.setItem('mavSession', JSON.stringify({
+    name:        user.name,
+    email:       user.email,
+    picture:     user.picture,
+    accessToken: user.accessToken,
+    tokenExpiry: user.tokenExpiry   // ms timestamp when token expires
+  }));
+}
+function loadSession() {
+  try {
+    const s = localStorage.getItem('mavSession');
+    if (!s) return null;
+    const d = JSON.parse(s);
+    // Token valid if it expires more than 2 minutes from now
+    if (d.accessToken && d.tokenExpiry && d.tokenExpiry > Date.now() + 120000) {
+      return d;
+    }
+    // Token expired but we have user info — return without token for silent refresh
+    if (d.name) return { ...d, accessToken: null, tokenExpiry: null };
+    return null;
+  } catch(e) { return null; }
+}
+function clearSession() {
+  localStorage.removeItem('mavSession');
+  // Keep mavUser for backwards compat display only
+  localStorage.removeItem('mavUser');
+}
 
 // ── Recent trips (for suggestions) ──
 function getRecentTrips() {
@@ -3261,7 +3292,10 @@ function onGapiLoaded() {
   gapi.load('client', async () => {
     await gapi.client.init({});
     gApiReady = true;
-    if (currentUser?.accessToken) gapi.client.setToken({ access_token: currentUser.accessToken });
+    // If we already have a valid token from session restore, apply it now
+    if (currentUser?.accessToken) {
+      gapi.client.setToken({ access_token: currentUser.accessToken });
+    }
   });
 }
 // Called by google gsi script onload
@@ -3270,7 +3304,8 @@ window.onGapiLoaded = onGapiLoaded;
 // ── Start login ──
 function startGoogleLogin() {
   initTokenClient();
-  gTokenClient.requestAccessToken({ prompt: 'consent' });
+  // 'select_account' shows account picker on explicit login button click
+  gTokenClient.requestAccessToken({ prompt: 'select_account' });
 }
 
 function initTokenClient() {
@@ -3284,14 +3319,34 @@ function initTokenClient() {
 
 async function onTokenReceived(tokenResponse) {
   if (tokenResponse.error) {
-    showToast('❌ Login falhou: ' + tokenResponse.error);
+    // Silent refresh failed — show login screen
     document.getElementById('loginScreen').style.display = 'flex';
+    if (tokenResponse.error !== 'user_cancel') {
+      console.warn('Token error:', tokenResponse.error);
+    }
     return;
   }
 
   const accessToken = tokenResponse.access_token;
+  const expiresIn   = (tokenResponse.expires_in || 3600) * 1000; // ms
+  const tokenExpiry = Date.now() + expiresIn;
 
-  // Get user info
+  // Schedule silent refresh 5 minutes before expiry
+  if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
+  tokenRefreshTimer = setTimeout(() => silentRefresh(), expiresIn - 300000);
+
+  // If we already have user info (silent refresh), just update token
+  if (currentUser?.email) {
+    currentUser.accessToken = accessToken;
+    currentUser.tokenExpiry = tokenExpiry;
+    if (gApiReady) gapi.client.setToken({ access_token: accessToken });
+    saveSession(currentUser);
+    gTokenReady = true;
+    setSyncStatus('idle', '✓ Sheets');
+    return;
+  }
+
+  // First login — fetch user profile
   try {
     const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: 'Bearer ' + accessToken }
@@ -3301,15 +3356,18 @@ async function onTokenReceived(tokenResponse) {
       name: info.name,
       email: info.email,
       picture: info.picture,
-      accessToken
+      accessToken,
+      tokenExpiry
     };
+    saveSession(currentUser);
+    // Keep mavUser for backwards compat
     localStorage.setItem('mavUser', JSON.stringify({ name: info.name, email: info.email, picture: info.picture }));
 
     if (gApiReady) gapi.client.setToken({ access_token: accessToken });
-
     completeLogin();
   } catch(e) {
     showToast('❌ Erro ao obter perfil Google.');
+    document.getElementById('loginScreen').style.display = 'flex';
   }
 }
 
@@ -3370,33 +3428,65 @@ function signOut() {
   if (currentUser?.accessToken) {
     google.accounts.oauth2.revoke(currentUser.accessToken);
   }
+  if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
   currentUser = null;
   gTokenReady = false;
-  localStorage.removeItem('mavUser');
+  clearSession();
   document.getElementById('userPill').style.display = 'none';
   document.getElementById('userMenu')?.classList.remove('open');
   document.getElementById('loginScreen').style.display = 'flex';
   showToast('👋 Sessão encerrada.');
 }
 
-// ── Restore session from localStorage (silent re-login check) ──
+// ── Restore session — called on page load ──
 function tryRestoreSession() {
-  const saved = localStorage.getItem('mavUser');
-  if (!saved) {
+  const session = loadSession();
+
+  if (!session) {
+    // No saved session at all — show login
     document.getElementById('loginScreen').style.display = 'flex';
     return;
   }
-  // We have a saved user but need to get a new token
-  // Show login screen and attempt silent token acquisition
-  const info = JSON.parse(saved);
-  currentUser = { name: info.name, email: info.email, picture: info.picture, accessToken: null };
+
+  // Restore user info immediately (so UI shows name/avatar right away)
+  currentUser = { ...session };
   updateUserUI();
 
-  // Try silent token request
+  if (session.accessToken) {
+    // Token is still valid — go straight in, no Google popup at all
+    document.getElementById('loginScreen').style.display = 'none';
+    if (gApiReady) gapi.client.setToken({ access_token: session.accessToken });
+    gTokenReady = true;
+
+    // Schedule refresh before expiry
+    const msLeft = session.tokenExpiry - Date.now();
+    if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
+    tokenRefreshTimer = setTimeout(() => silentRefresh(), Math.max(msLeft - 300000, 10000));
+
+    syncFromSheet();
+    setSyncStatus('idle', '✓ Sheets');
+  } else {
+    // Token expired — try silent refresh in background, hide login screen optimistically
+    // Show a brief "reconnecting" state instead of forcing full login
+    document.getElementById('loginScreen').style.display = 'none';
+    setSyncStatus('syncing', 'Reconectando…');
+    silentRefresh();
+  }
+}
+
+// ── Silent token refresh (no user interaction) ──
+function silentRefresh() {
+  if (!window.google?.accounts?.oauth2) {
+    // GSI not loaded yet — retry in 2 seconds
+    setTimeout(() => silentRefresh(), 2000);
+    return;
+  }
   try {
     initTokenClient();
-    gTokenClient.requestAccessToken({ prompt: '' }); // '' = silent if already consented
+    // prompt: '' means silent if user has previously consented
+    gTokenClient.requestAccessToken({ prompt: '' });
   } catch(e) {
+    // If silent refresh fails, show login screen
     document.getElementById('loginScreen').style.display = 'flex';
   }
 }
